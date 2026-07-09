@@ -1,0 +1,2823 @@
+<div [class.light-mode]="!isDarkMode" class="flex h-screen w-screen bg-[#09090B] text-zinc-100 overflow-hidden font-sans relative">
+  
+  <!-- Mobile Sidebar Backdrop Overlay -->
+  @if (isMobileMenuOpen) {
+    <button 
+      (click)="isMobileMenuOpen = false" 
+      (keydown.enter)="isMobileMenuOpen = false" 
+      tabindex="0" 
+      aria-label="Schließen Sie das mobile Menü"
+      class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 md:hidden animate-fade-in cursor-default border-0 outline-none w-full h-full text-left"
+    ></button>
+  }  <!-- Left Workspace Sidebar -->
+  <aside 
+    id="app-sidebar"
+    [class.translate-x-0]="isMobileMenuOpen"
+    [class.-translate-x-full]="!isMobileMenuOpen && sidebarMode !== 'hidden'"
+    [class.w-64]="sidebarMode === 'full'"
+    [class.w-16]="sidebarMode === 'icons'"
+    [class.hidden]="sidebarMode === 'hidden'"
+    [class.md:flex]="sidebarMode !== 'hidden'"
+    [class.md:hidden]="sidebarMode === 'hidden'"
+    class="fixed inset-y-0 left-0 z-50 border-r border-zinc-800 bg-[#0C0C0E] flex flex-col justify-between shrink-0 transition-all duration-300 ease-in-out md:static md:translate-x-0 md:z-auto"
+  >
+    <div class="flex flex-col">
+      <!-- App Header and Logo -->
+      <div class="h-16 px-4 border-b border-zinc-800 flex items-center justify-between gap-3" [class.justify-center]="sidebarMode === 'icons'">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center shrink-0">
+            <mat-icon class="text-indigo-400 text-lg">visibility</mat-icon>
+          </div>
+          @if (sidebarMode === 'full') {
+            <div class="animate-fade-in">
+              <h1 class="text-sm font-semibold text-zinc-100 tracking-wide">DEMO</h1>
+              <p class="text-[10px] text-zinc-500 uppercase font-mono tracking-wider">Intelligentes System</p>
+            </div>
+          }
+        </div>
+        <!-- Close Menu Button for mobile -->
+        @if (sidebarMode === 'full') {
+          <button (click)="isMobileMenuOpen = false" class="md:hidden p-1.5 text-zinc-500 hover:text-white rounded-lg hover:bg-zinc-850 transition-colors focus:outline-none">
+            <mat-icon class="text-lg">close</mat-icon>
+          </button>
+        }
+      </div>
+ 
+       <!-- Live Operations Status -->
+       @if (sidebarMode === 'full') {
+         <div class="p-4 mx-4 my-3 bg-zinc-900/30 rounded-xl border border-zinc-800 animate-fade-in">
+           <div class="flex justify-between items-center mb-1.5">
+             <span class="text-[10px] text-zinc-400 font-mono">SYSTEMSTATUS</span>
+             <span class="flex h-2 w-2 relative">
+               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+               <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+             </span>
+           </div>
+           <div class="flex justify-between items-center text-xs">
+             <span class="text-zinc-300 font-sans">Edge-Verarbeitung</span>
+             <span class="font-mono text-indigo-400 font-medium">AKTIV</span>
+           </div>
+           <div class="mt-2 text-[10px] text-zinc-500 flex items-center gap-1.5">
+             <mat-icon class="text-[12px] w-3 h-3 text-indigo-400">check_circle</mat-icon>
+             Kameras online: 2/2
+           </div>
+         </div>
+       }
+ 
+       <!-- Navigation Menu Tabs -->
+       <nav class="px-2 space-y-1" [class.px-1.5]="sidebarMode === 'icons'">
+         <button 
+           (click)="activeTab = 'dashboard'; isMobileMenuOpen = false"
+           [class.bg-zinc-800/50]="activeTab === 'dashboard'"
+           [class.text-white]="activeTab === 'dashboard'"
+           [class.text-zinc-400]="activeTab !== 'dashboard'"
+           [class.justify-center]="sidebarMode === 'icons'"
+           [class.px-3]="sidebarMode === 'full'"
+           [class.px-0]="sidebarMode === 'icons'"
+           [class.w-12]="sidebarMode === 'icons'"
+           [class.h-12]="sidebarMode === 'icons'"
+           [class.mx-auto]="sidebarMode === 'icons'"
+           class="w-full flex items-center gap-3 py-2.5 rounded-lg text-xs font-medium hover:bg-zinc-800/30 hover:text-white transition-all group cursor-pointer"
+           title="Betriebspanel"
+         >
+           <mat-icon class="text-lg shrink-0" [class.text-indigo-400]="activeTab === 'dashboard'">dashboard</mat-icon>
+           @if (sidebarMode === 'full') {
+             <span class="animate-fade-in">Betriebspanel</span>
+           }
+         </button>
+
+         <button 
+           (click)="activeTab = 'camera'; isMobileMenuOpen = false"
+           [class.bg-zinc-800/50]="activeTab === 'camera'"
+           [class.text-white]="activeTab === 'camera'"
+           [class.text-zinc-400]="activeTab !== 'camera'"
+           [class.justify-center]="sidebarMode === 'icons'"
+           [class.px-3]="sidebarMode === 'full'"
+           [class.px-0]="sidebarMode === 'icons'"
+           [class.w-12]="sidebarMode === 'icons'"
+           [class.h-12]="sidebarMode === 'icons'"
+           [class.mx-auto]="sidebarMode === 'icons'"
+           class="w-full flex items-center justify-between py-2.5 rounded-lg text-xs font-medium hover:bg-zinc-800/30 hover:text-white transition-all group cursor-pointer"
+           title="Live-Kameras & KI"
+         >
+           <div class="flex items-center gap-3">
+             <mat-icon class="text-lg shrink-0" [class.text-indigo-400]="activeTab === 'camera'">videocam</mat-icon>
+             @if (sidebarMode === 'full') {
+               <span class="animate-fade-in">Live-Kameras & KI</span>
+             }
+           </div>
+           @if (sidebarMode === 'full') {
+             <span class="text-[9px] bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded font-mono font-bold tracking-wider animate-pulse">CCTV</span>
+           }
+         </button>
+
+         <button 
+           (click)="activeTab = 'inventory'; isMobileMenuOpen = false"
+           [class.bg-zinc-800/50]="activeTab === 'inventory'"
+           [class.text-white]="activeTab === 'inventory'"
+           [class.text-zinc-400]="activeTab !== 'inventory'"
+           [class.justify-center]="sidebarMode === 'icons'"
+           [class.px-3]="sidebarMode === 'full'"
+           [class.px-0]="sidebarMode === 'icons'"
+           [class.w-12]="sidebarMode === 'icons'"
+           [class.h-12]="sidebarMode === 'icons'"
+           [class.mx-auto]="sidebarMode === 'icons'"
+           class="w-full flex items-center justify-between py-2.5 rounded-lg text-xs font-medium hover:bg-zinc-800/30 hover:text-white transition-all group cursor-pointer"
+           title="Lager & Zutritt"
+         >
+           <div class="flex items-center gap-3">
+             <mat-icon class="text-lg shrink-0" [class.text-indigo-400]="activeTab === 'inventory'">inventory_2</mat-icon>
+             @if (sidebarMode === 'full') {
+               <span class="animate-fade-in">Lager & Zutritt</span>
+             }
+           </div>
+           @if (sidebarMode === 'full') {
+             @if (alertsCount > 0) {
+               <span class="text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded font-mono font-bold">{{ alertsCount }}</span>
+             }
+           }
+         </button>
+
+         <button 
+           (click)="activeTab = 'assistant'; isMobileMenuOpen = false"
+           [class.bg-zinc-800/50]="activeTab === 'assistant'"
+           [class.text-white]="activeTab === 'assistant'"
+           [class.text-zinc-400]="activeTab !== 'assistant'"
+           [class.justify-center]="sidebarMode === 'icons'"
+           [class.px-3]="sidebarMode === 'full'"
+           [class.px-0]="sidebarMode === 'icons'"
+           [class.w-12]="sidebarMode === 'icons'"
+           [class.h-12]="sidebarMode === 'icons'"
+           [class.mx-auto]="sidebarMode === 'icons'"
+           class="w-full flex items-center gap-3 py-2.5 rounded-lg text-xs font-medium hover:bg-zinc-800/30 hover:text-white transition-all group cursor-pointer"
+           title="Gemini KI-Assistent"
+         >
+           <mat-icon class="text-lg shrink-0" [class.text-indigo-400]="activeTab === 'assistant'">psychology</mat-icon>
+           @if (sidebarMode === 'full') {
+             <span class="animate-fade-in">Gemini KI-Assistent</span>
+           }
+         </button>
+
+         <button 
+           (click)="activeTab = 'reports'; isMobileMenuOpen = false"
+           [class.bg-zinc-800/50]="activeTab === 'reports'"
+           [class.text-white]="activeTab === 'reports'"
+           [class.text-zinc-400]="activeTab !== 'reports'"
+           [class.justify-center]="sidebarMode === 'icons'"
+           [class.px-3]="sidebarMode === 'full'"
+           [class.px-0]="sidebarMode === 'icons'"
+           [class.w-12]="sidebarMode === 'icons'"
+           [class.h-12]="sidebarMode === 'icons'"
+           [class.mx-auto]="sidebarMode === 'icons'"
+           class="w-full flex items-center justify-between py-2.5 rounded-lg text-xs font-medium hover:bg-zinc-800/30 hover:text-white transition-all group cursor-pointer"
+           title="PDF-Betriebsberichte"
+         >
+           <div class="flex items-center gap-3">
+             <mat-icon class="text-lg shrink-0" [class.text-indigo-400]="activeTab === 'reports'">picture_as_pdf</mat-icon>
+             @if (sidebarMode === 'full') {
+               <span class="animate-fade-in">PDF-Betriebsberichte</span>
+             }
+           </div>
+           @if (sidebarMode === 'full') {
+             <span class="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1.5 py-0.5 rounded font-mono font-bold tracking-wider font-mono">PDF</span>
+           }
+         </button>
+
+         <button 
+           (click)="activeTab = 'system_health'; isMobileMenuOpen = false"
+           [class.bg-zinc-800/50]="activeTab === 'system_health'"
+           [class.text-white]="activeTab === 'system_health'"
+           [class.text-zinc-400]="activeTab !== 'system_health'"
+           [class.justify-center]="sidebarMode === 'icons'"
+           [class.px-3]="sidebarMode === 'full'"
+           [class.px-0]="sidebarMode === 'icons'"
+           [class.w-12]="sidebarMode === 'icons'"
+           [class.h-12]="sidebarMode === 'icons'"
+           [class.mx-auto]="sidebarMode === 'icons'"
+           class="w-full flex items-center justify-between py-2.5 rounded-lg text-xs font-medium hover:bg-zinc-800/30 hover:text-white transition-all group cursor-pointer"
+           title="Systemgesundheit"
+         >
+           <div class="flex items-center gap-3">
+             <mat-icon class="text-lg shrink-0" [class.text-indigo-400]="activeTab === 'system_health'">dns</mat-icon>
+             @if (sidebarMode === 'full') {
+               <span class="animate-fade-in">Systemgesundheit</span>
+             }
+           </div>
+           @if (sidebarMode === 'full') {
+             <span class="flex h-1.5 w-1.5 relative">
+               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+               <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+             </span>
+           }
+         </button>
+
+         <button 
+           (click)="activeTab = 'architecture'; isMobileMenuOpen = false"
+           [class.bg-zinc-800/50]="activeTab === 'architecture'"
+           [class.text-white]="activeTab === 'architecture'"
+           [class.text-zinc-400]="activeTab !== 'architecture'"
+           [class.justify-center]="sidebarMode === 'icons'"
+           [class.px-3]="sidebarMode === 'full'"
+           [class.px-0]="sidebarMode === 'icons'"
+           [class.w-12]="sidebarMode === 'icons'"
+           [class.h-12]="sidebarMode === 'icons'"
+           [class.mx-auto]="sidebarMode === 'icons'"
+           class="w-full flex items-center gap-3 py-2.5 rounded-lg text-xs font-medium hover:bg-zinc-800/30 hover:text-white transition-all group cursor-pointer"
+           title="Architekturplan"
+         >
+           <mat-icon class="text-lg shrink-0" [class.text-indigo-400]="activeTab === 'architecture'">account_tree</mat-icon>
+           @if (sidebarMode === 'full') {
+             <span class="animate-fade-in">Architekturplan</span>
+           }
+         </button>
+       </nav>
+    </div>
+ 
+    <!-- Tenant and Profile Info -->
+    <div class="p-4 border-t border-zinc-800 bg-[#0C0C0E]/40">
+      <div class="flex items-center gap-3" [class.justify-center]="sidebarMode === 'icons'">
+        <div class="w-9 h-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center font-bold text-xs text-white shrink-0">
+          HH
+        </div>
+        @if (sidebarMode === 'full') {
+          <div class="overflow-hidden animate-fade-in">
+            <p class="text-xs font-medium text-zinc-200 truncate font-sans">Hotel Hamburg</p>
+            <p class="text-[10px] text-zinc-500 font-mono truncate">ID: Tenant-08221</p>
+          </div>
+        }
+      </div>
+    </div>
+  </aside>
+ 
+   <!-- Right Side Main Panel Workspace -->
+   <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#09090B]">
+     
+     <!-- Top Global Header -->
+     <header class="h-16 border-b border-zinc-800 bg-[#0C0C0E] flex items-center justify-between px-4 md:px-8 shrink-0 z-20">
+       <div class="flex items-center gap-2 md:gap-3">
+         <button (click)="isMobileMenuOpen = !isMobileMenuOpen" class="md:hidden text-zinc-400 hover:text-white mr-1 focus:outline-none flex items-center justify-center p-1.5 rounded-lg border border-zinc-800 bg-zinc-900/40">
+           <mat-icon class="text-lg">menu</mat-icon>
+         </button>
+         @if (sidebarMode === 'hidden') {
+           <button 
+             (click)="setSidebarMode('full')" 
+             class="hidden md:flex text-zinc-400 hover:text-white mr-1 focus:outline-none items-center justify-center p-1.5 rounded-lg border border-zinc-800 bg-zinc-900/40 cursor-pointer"
+             title="Seitenleiste anzeigen"
+           >
+             <mat-icon class="text-lg">menu</mat-icon>
+           </button>
+         }
+         <div>
+           <h2 class="text-[11px] sm:text-xs font-semibold text-zinc-100 tracking-wide uppercase font-sans truncate max-w-[140px] xs:max-w-[200px] sm:max-w-none">
+             @switch (activeTab) {
+               @case ('dashboard') { Echtzeit-Betriebspanel }
+               @case ('camera') { CCTV-Analysezentrum }
+               @case ('inventory') { Zentralisierte Bestandsdatenbank }
+               @case ('assistant') { Kognitiver Vision-KI-Assistent }
+               @case ('reports') { PDF-Betriebsberichte }
+                @case ('system_health') { Systemgesundheit & Inferenz-Cluster }
+               @case ('architecture') { Architekturplan & Technische Spezifikation }
+             }
+           </h2>
+           <div class="flex items-center gap-1 sm:hidden">
+             <span class="w-1 h-1 rounded-full bg-emerald-500"></span>
+             <p class="text-[9px] text-zinc-500 font-sans">Tenant: Hamburg</p>
+           </div>
+         </div>
+         <span class="w-1 h-1 rounded-full bg-zinc-700 hidden sm:block"></span>
+         <p class="text-[11px] text-zinc-400 font-sans hidden sm:block">Tenant: Hotel Hamburg</p>
+       </div>
+ 
+       <!-- Clock & Quick Stats -->
+       <div class="flex items-center gap-3 md:gap-6">
+         <!-- Layout-Steuerung -->
+         <div class="flex items-center bg-zinc-950/60 p-1 rounded-lg border border-zinc-800/80 text-[10px] font-mono">
+           <button 
+             id="btnSidebarFull"
+             (click)="setSidebarMode('full')"
+             class="px-2 py-1 rounded cursor-pointer transition-all flex items-center gap-1 border-none bg-transparent"
+             [class.bg-zinc-800]="sidebarMode === 'full'"
+             [class.text-indigo-400]="sidebarMode === 'full'"
+             [class.text-zinc-500]="sidebarMode !== 'full'"
+             title="Vollständiges Menü"
+           >
+             <mat-icon class="text-[14px] w-3.5 h-3.5">view_sidebar</mat-icon>
+             <span class="hidden lg:inline text-[9px]">Vollständig</span>
+           </button>
+           <button 
+             id="btnSidebarIcons"
+             (click)="setSidebarMode('icons')"
+             class="px-2 py-1 rounded cursor-pointer transition-all flex items-center gap-1 border-none bg-transparent"
+             [class.bg-zinc-800]="sidebarMode === 'icons'"
+             [class.text-indigo-400]="sidebarMode === 'icons'"
+             [class.text-zinc-500]="sidebarMode !== 'icons'"
+             title="Nur Symbole"
+           >
+             <mat-icon class="text-[14px] w-3.5 h-3.5">grid_view</mat-icon>
+             <span class="hidden lg:inline text-[9px]">Symbole</span>
+           </button>
+           <button 
+             id="btnSidebarHidden"
+             (click)="setSidebarMode('hidden')"
+             class="px-2 py-1 rounded cursor-pointer transition-all flex items-center gap-1 border-none bg-transparent"
+             [class.bg-zinc-800]="sidebarMode === 'hidden'"
+             [class.text-indigo-400]="sidebarMode === 'hidden'"
+             [class.text-zinc-500]="sidebarMode !== 'hidden'"
+             title="Menü ausblenden"
+           >
+             <mat-icon class="text-[14px] w-3.5 h-3.5">visibility_off</mat-icon>
+             <span class="hidden lg:inline text-[9px]">Ausblenden</span>
+           </button>
+         </div>
+
+         <div class="text-right font-mono hidden sm:block">
+           <p class="text-[11px] text-indigo-400 font-semibold">{{ getCurrentTime() }}</p>
+           <p class="text-[9px] text-zinc-500">BETRIEBSAUDIT AKTIV</p>
+         </div>
+          <!-- Theme Toggle Button -->
+          <button 
+            (click)="toggleTheme()"
+            class="flex items-center justify-center p-1.5 rounded-lg border border-zinc-800 bg-zinc-950/60 hover:bg-zinc-850 text-zinc-400 hover:text-indigo-400 cursor-pointer transition-all duration-200"
+            [title]="isDarkMode ? 'Helles Design aktivieren' : 'Dunkles Design aktivieren'"
+          >
+            <mat-icon class="text-sm w-4 h-4">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+          </button>
+
+         <div class="h-8 w-px bg-zinc-800 hidden sm:block"></div>
+         <div class="flex items-center gap-2">
+           <div class="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>
+           <span class="text-[10px] sm:text-xs text-zinc-300 font-medium font-mono sm:font-sans">KI: OK</span>
+         </div>
+       </div>
+     </header>
+     
+     <!-- Content Workspace Wrapper -->
+     <div class="flex-1 overflow-y-auto p-4 md:p-8">
+ 
+       <!-- ========================================== -->
+       <!-- TAB 1: OPERATIVE DASHBOARD -->
+       <!-- ========================================== -->
+       @if (activeTab === 'dashboard') {
+         <div class="space-y-6 md:space-y-8 animate-fade-in">
+            
+            <!-- Dashboard Layout Manager (Vista Ordenada) -->
+            <div class="bg-zinc-950/60 border border-zinc-800 rounded-2xl p-4 md:p-5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+                  <mat-icon>dashboard_customize</mat-icon>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider font-mono">Sichtbarkeits- & Organisationssteuerung</h3>
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                  </div>
+                  <p class="text-[10px] text-zinc-500 mt-0.5">Blenden Sie ganze Abschnitte ein oder aus, um einen übersichtlicheren Arbeitsbereich mit besserer Sichtbarkeit zu erhalten.</p>
+                </div>
+              </div>
+
+              <!-- Layout Toggles -->
+              <div class="flex flex-wrap items-center gap-2 text-[10px] font-mono w-full lg:w-auto">
+                <div class="flex gap-1.5 w-full sm:w-auto">
+                  <button 
+                    (click)="toggleAllDashboardPanels(true)"
+                    class="flex-1 sm:flex-initial px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-all cursor-pointer border-none flex items-center justify-center gap-1"
+                  >
+                    <mat-icon class="text-xs">visibility</mat-icon>
+                    <span>Alle anzeigen</span>
+                  </button>
+                  <button 
+                    (click)="toggleAllDashboardPanels(false)"
+                    class="flex-1 sm:flex-initial px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold transition-all cursor-pointer border-none flex items-center justify-center gap-1"
+                  >
+                    <mat-icon class="text-xs">visibility_off</mat-icon>
+                    <span>Alle ausblenden</span>
+                  </button>
+                </div>
+                
+                <div class="hidden sm:block h-6 w-px bg-zinc-800 mx-1"></div>
+
+                <!-- Individual Toggles -->
+                <div class="flex flex-wrap gap-1.5">
+                  <button 
+                    (click)="toggleFiltersPanel()"
+                    [class.bg-indigo-500/10]="showFiltersPanel"
+                    [class.text-indigo-400]="showFiltersPanel"
+                    [class.border-indigo-500/20]="showFiltersPanel"
+                    [class.bg-zinc-900/40]="!showFiltersPanel"
+                    [class.text-zinc-500]="!showFiltersPanel"
+                    [class.border-zinc-850]="!showFiltersPanel"
+                    class="px-2.5 py-1.5 rounded border cursor-pointer transition-all flex items-center gap-1 hover:text-zinc-200"
+                  >
+                    <mat-icon class="text-[11px] leading-none">{{ showFiltersPanel ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                    <span>Filter</span>
+                  </button>
+
+                  <button 
+                    (click)="toggleKpisPanel()"
+                    [class.bg-indigo-500/10]="showKpisPanel"
+                    [class.text-indigo-400]="showKpisPanel"
+                    [class.border-indigo-500/20]="showKpisPanel"
+                    [class.bg-zinc-900/40]="!showKpisPanel"
+                    [class.text-zinc-500]="!showKpisPanel"
+                    [class.border-zinc-850]="!showKpisPanel"
+                    class="px-2.5 py-1.5 rounded border cursor-pointer transition-all flex items-center gap-1 hover:text-zinc-200"
+                  >
+                    <mat-icon class="text-[11px] leading-none">{{ showKpisPanel ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                    <span>KPIs</span>
+                  </button>
+
+                  <button 
+                    (click)="toggleStatsPanel()"
+                    [class.bg-indigo-500/10]="showStatsPanel"
+                    [class.text-indigo-400]="showStatsPanel"
+                    [class.border-indigo-500/20]="showStatsPanel"
+                    [class.bg-zinc-900/40]="!showStatsPanel"
+                    [class.text-zinc-500]="!showStatsPanel"
+                    [class.border-zinc-850]="!showStatsPanel"
+                    class="px-2.5 py-1.5 rounded border cursor-pointer transition-all flex items-center gap-1 hover:text-zinc-200"
+                  >
+                    <mat-icon class="text-[11px] leading-none">{{ showStatsPanel ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                    <span>Metriken</span>
+                  </button>
+
+                  <button 
+                    (click)="toggleChartPanel()"
+                    [class.bg-indigo-500/10]="showChartPanel"
+                    [class.text-indigo-400]="showChartPanel"
+                    [class.border-indigo-500/20]="showChartPanel"
+                    [class.bg-zinc-900/40]="!showChartPanel"
+                    [class.text-zinc-500]="!showChartPanel"
+                    [class.border-zinc-850]="!showChartPanel"
+                    class="px-2.5 py-1.5 rounded border cursor-pointer transition-all flex items-center gap-1 hover:text-zinc-200"
+                  >
+                    <mat-icon class="text-[11px] leading-none">{{ showChartPanel ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                    <span>Trends</span>
+                  </button>
+
+                  <button 
+                    (click)="toggleForecastPanel()"
+                    [class.bg-indigo-500/10]="showForecastPanel"
+                    [class.text-indigo-400]="showForecastPanel"
+                    [class.border-indigo-500/20]="showForecastPanel"
+                    [class.bg-zinc-900/40]="!showForecastPanel"
+                    [class.text-zinc-500]="!showForecastPanel"
+                    [class.border-zinc-850]="!showForecastPanel"
+                    class="px-2.5 py-1.5 rounded border cursor-pointer transition-all flex items-center gap-1 hover:text-zinc-200"
+                  >
+                    <mat-icon class="text-[11px] leading-none">{{ showForecastPanel ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                    <span>Prognosen</span>
+                  </button>
+
+                  <button 
+                    (click)="toggleInventoryEventsPanel()"
+                    [class.bg-indigo-500/10]="showInventoryEventsPanel"
+                    [class.text-indigo-400]="showInventoryEventsPanel"
+                    [class.border-indigo-500/20]="showInventoryEventsPanel"
+                    [class.bg-zinc-900/40]="!showInventoryEventsPanel"
+                    [class.text-zinc-500]="!showInventoryEventsPanel"
+                    [class.border-zinc-850]="!showInventoryEventsPanel"
+                    class="px-2.5 py-1.5 rounded border cursor-pointer transition-all flex items-center gap-1 hover:text-zinc-200"
+                  >
+                    <mat-icon class="text-[11px] leading-none">{{ showInventoryEventsPanel ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                    <span>Bestand & Fluss</span>
+                  </button>
+
+                  <button 
+                    (click)="toggleHeatmapPersonnelPanel()"
+                    [class.bg-indigo-500/10]="showHeatmapPersonnelPanel"
+                    [class.text-indigo-400]="showHeatmapPersonnelPanel"
+                    [class.border-indigo-500/20]="showHeatmapPersonnelPanel"
+                    [class.bg-zinc-900/40]="!showHeatmapPersonnelPanel"
+                    [class.text-zinc-500]="!showHeatmapPersonnelPanel"
+                    [class.border-zinc-850]="!showHeatmapPersonnelPanel"
+                    class="px-2.5 py-1.5 rounded border cursor-pointer transition-all flex items-center gap-1 hover:text-zinc-200"
+                  >
+                    <mat-icon class="text-[11px] leading-none">{{ showHeatmapPersonnelPanel ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                    <span>Bereiche & Personal</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dashboard Unified Filtering Panel -->
+            @if (showFiltersPanel) {
+              <div id="filterCenterPanel" class="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-5 md:p-6 space-y-4">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>
+                  <h3 class="text-xs font-bold text-zinc-300 uppercase tracking-wider font-mono">Filter-Zentrum (Echtzeit-Analyse)</h3>
+                </div>
+                <div class="flex items-center gap-3">
+                  <button (click)="resetFilters()" id="btnResetFilters" class="text-[10px] text-zinc-400 hover:text-zinc-200 bg-zinc-850 hover:bg-zinc-800 px-2.5 py-1 rounded-lg border border-zinc-800 transition-all flex items-center gap-1 cursor-pointer">
+                    <mat-icon class="text-xs">restart_alt</mat-icon>
+                    <span>Zurücksetzen</span>
+                  </button>
+                  <button (click)="toggleFiltersPanel()" class="text-zinc-500 hover:text-zinc-300 transition-colors flex items-center justify-center p-1 rounded hover:bg-zinc-800 cursor-pointer border-none bg-transparent" title="Bereich ausblenden">
+                    <mat-icon class="text-xs">close</mat-icon>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <!-- Date-Range Picker: Start Date -->
+                <div class="space-y-1.5">
+                  <label for="inputFilterStartDate" class="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold font-sans block">Start-Datum</label>
+                  <div class="relative flex items-center">
+                    <input 
+                      type="date" 
+                      id="inputFilterStartDate"
+                      [value]="filterStartDate" 
+                      (input)="onStartDateChange($event)"
+                      class="w-full bg-[#0C0C0E] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 font-mono focus:border-indigo-500 focus:outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                <!-- Date-Range Picker: End Date -->
+                <div class="space-y-1.5">
+                  <label for="inputFilterEndDate" class="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold font-sans block">End-Datum</label>
+                  <div class="relative flex items-center">
+                    <input 
+                      type="date" 
+                      id="inputFilterEndDate"
+                      [value]="filterEndDate" 
+                      (input)="onEndDateChange($event)"
+                      class="w-full bg-[#0C0C0E] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 font-mono focus:border-indigo-500 focus:outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                <!-- Category Selector -->
+                <div class="space-y-1.5">
+                  <label for="selectFilterCategory" class="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold font-sans block">Produkt-Kategorie</label>
+                  <select 
+                    id="selectFilterCategory"
+                    [value]="selectedCategory" 
+                    (change)="onCategoryChange($event)"
+                    class="w-full bg-[#0C0C0E] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 font-sans focus:border-indigo-500 focus:outline-none transition-all appearance-none cursor-pointer"
+                  >
+                    @for (cat of categories; track cat) {
+                      <option [value]="cat">{{ cat }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+            </div>
+            }
+                <!-- Advanced KPIs / Indicadores de Rendimiento Clave -->
+            @if (showKpisPanel) {
+            <div class="space-y-3">
+              <div class="flex justify-between items-center bg-zinc-950/20 px-4 py-2.5 rounded-xl border border-zinc-850/60 mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                  <span class="text-[10px] uppercase tracking-wider font-bold text-zinc-300 font-mono">Wichtige Leistungsindikatoren (Erweiterte KPIs)</span>
+                </div>
+                <button (click)="toggleKpisPanel()" class="text-zinc-500 hover:text-zinc-300 transition-colors flex items-center justify-center p-1 rounded hover:bg-zinc-800 cursor-pointer border-none bg-transparent" title="Bereich ausblenden">
+                  <mat-icon class="text-xs">close</mat-icon>
+                </button>
+              </div>
+             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+               
+               <!-- KPI 1: Tiempo medio de inactividad de cámaras -->
+               <div class="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-5 hover:border-zinc-700/80 transition-all flex items-center justify-between group">
+                 <div class="space-y-1">
+                   <span class="text-[9px] uppercase tracking-wider font-bold text-zinc-500 font-mono">Mittlere Ausfallzeit</span>
+                   <h4 class="text-2xl font-bold text-zinc-100 font-mono tracking-tight">{{ meanCameraDowntime }}</h4>
+                   <p class="text-[9px] text-zinc-400">Durchschnittliche CCTV-Ausfallzeit</p>
+                 </div>
+                 <div class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center transition-transform group-hover:scale-110">
+                   <mat-icon class="text-xl">videocam_off</mat-icon>
+                 </div>
+               </div>
+ 
+               <!-- KPI 2: Exactitud de inferencia IA -->
+               <div class="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-5 hover:border-zinc-700/80 transition-all flex items-center justify-between group">
+                 <div class="space-y-1">
+                   <span class="text-[9px] uppercase tracking-wider font-bold text-zinc-500 font-mono">KI-Inferenzgenauigkeit</span>
+                   <h4 class="text-2xl font-bold text-indigo-400 font-mono tracking-tight">{{ aiInferenceAccuracy }}</h4>
+                   <p class="text-[9px] text-zinc-400">Präzision neuronaler Netze</p>
+                 </div>
+                 <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center transition-transform group-hover:scale-110">
+                   <mat-icon class="text-xl">psychology</mat-icon>
+                 </div>
+               </div>
+ 
+               <!-- KPI 3: Eficiencia de rotación de inventario -->
+               <div class="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-5 hover:border-zinc-700/80 transition-all flex items-center justify-between group">
+                 <div class="space-y-1">
+                   <span class="text-[9px] uppercase tracking-wider font-bold text-zinc-500 font-mono">Umschlagseffizienz</span>
+                   <h4 class="text-2xl font-bold text-emerald-400 font-mono tracking-tight">{{ inventoryTurnoverEfficiency }}</h4>
+                   <p class="text-[9px] text-zinc-400">Umschlagsgeschwindigkeit vs. Lagerbestände</p>
+                 </div>
+                 <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center transition-transform group-hover:scale-110">
+                   <mat-icon class="text-xl">autorenew</mat-icon>
+                 </div>
+               </div>
+
+             </div>
+           </div>
+           }
+           
+           <!-- Key Metrics / KPI Banner -->
+           @if (showStatsPanel) {
+             <div class="flex justify-between items-center bg-zinc-950/20 px-4 py-2.5 rounded-xl border border-zinc-850/60 mb-2">
+               <div class="flex items-center gap-2">
+                 <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                 <span class="text-[10px] uppercase tracking-wider font-bold text-zinc-300 font-mono">Operative Leistungskennzahlen</span>
+               </div>
+               <button (click)="toggleStatsPanel()" class="text-zinc-500 hover:text-zinc-300 transition-colors flex items-center justify-center p-1 rounded hover:bg-zinc-800 cursor-pointer border-none bg-transparent" title="Bereich ausblenden">
+                 <mat-icon class="text-xs">close</mat-icon>
+               </button>
+             </div>
+             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
+              <div class="flex items-center justify-between text-zinc-400 mb-2">
+                <span class="text-[10px] uppercase tracking-wider font-semibold font-sans">Audits heute</span>
+                <mat-icon class="text-indigo-400 text-lg">check_circle</mat-icon>
+              </div>
+              <p class="text-2xl font-semibold text-zinc-100 font-mono">{{ filteredEvents.length }}</p>
+              <p class="text-[10px] text-zinc-500 mt-1">Automatische Betriebsvorgänge</p>
+            </div>
+
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
+              <div class="flex items-center justify-between text-zinc-400 mb-2">
+                <span class="text-[10px] uppercase tracking-wider font-semibold font-sans">Präzisionsrate</span>
+                <mat-icon class="text-indigo-400 text-lg">verified</mat-icon>
+              </div>
+              <p class="text-2xl font-semibold text-zinc-100 font-mono">99.42%</p>
+              <p class="text-[10px] text-indigo-400/80 mt-1">✓ Unternehmensziel übertroffen</p>
+            </div>
+
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
+              <div class="flex items-center justify-between text-zinc-400 mb-2">
+                <span class="text-[10px] uppercase tracking-wider font-semibold font-sans">Geringer Bestand</span>
+                <mat-icon class="text-amber-400 text-lg">warning</mat-icon>
+              </div>
+              <p class="text-2xl font-semibold text-zinc-100 font-mono" [class.text-amber-400]="alertsCount > 0">{{ alertsCount }}</p>
+              <p class="text-[10px] text-zinc-500 mt-1">Artikel unter kritischem Limit</p>
+            </div>
+
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
+              <div class="flex items-center justify-between text-zinc-400 mb-2">
+                <span class="text-[10px] uppercase tracking-wider font-semibold font-sans">Aktive Personen</span>
+                <mat-icon class="text-indigo-400 text-lg">people</mat-icon>
+              </div>
+              <p class="text-2xl font-semibold text-zinc-100 font-mono">3</p>
+              <p class="text-[10px] text-zinc-500 mt-1">Mit verknüpftem Dienstausweis</p>
+            </div>
+          </div>
+
+          <!-- Alert banner if low stock -->
+          @if (alertsCount > 0) {
+            <div class="bg-amber-500/5 border border-amber-500/20 text-amber-300 rounded-xl p-4 flex items-center gap-3 text-xs">
+              <mat-icon class="text-amber-400 text-lg">warning_amber</mat-icon>
+              <div>
+                <strong class="font-medium">Logistik-Hinweis:</strong> Es gibt {{ alertsCount }} Artikel mit Beständen unter dem Mindestsicherheitslimit. Eine Nachbestellung wird empfohlen.
+              </div>
+            </div>
+          }
+          }
+
+          <!-- Bestandsbewegungen & Monatstrend (Recharts-Style-Visualisierung) -->
+          @if (showChartPanel) {
+          <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+              <div class="flex-1">
+                <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider">Monatliche Lagerbewegungen & Bestandsänderungen</h3>
+                <p class="text-[10px] text-zinc-500 mt-0.5">Interaktives Recharts-Liniendiagramm für Ein- und Ausgänge des Hotel Hamburg über die Zeit</p>
+              </div>
+              <button (click)="toggleChartPanel()" class="text-zinc-500 hover:text-zinc-300 transition-colors flex items-center justify-center p-1 rounded hover:bg-zinc-800 cursor-pointer border-none bg-transparent" title="Bereich ausblenden">
+                <mat-icon class="text-xs">close</mat-icon>
+              </button>
+            </div>
+
+            <!-- Responsive Chart Canvas with Recharts -->
+            <div class="relative w-full h-[320px] overflow-visible select-none">
+              <div #chartContainer class="w-full h-full"></div>
+            </div>
+          </div>
+          }
+
+          <!-- Probabilistic Stock Forecast Widget -->
+          @if (showForecastPanel) {
+          <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+              <div class="flex-1">
+                <div class="flex justify-between items-center mb-1">
+                  <div class="flex items-center gap-2">
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Stochastisches Prognosemodell</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  </div>
+                  <button (click)="toggleForecastPanel()" class="text-zinc-500 hover:text-zinc-300 transition-colors flex items-center justify-center p-1 rounded hover:bg-zinc-800 cursor-pointer border-none bg-transparent" title="Bereich ausblenden">
+                    <mat-icon class="text-xs">close</mat-icon>
+                  </button>
+                </div>
+                <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider">Probabilistische Bedarfs- & Meldebestandsprognose</h3>
+                <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Analysiert historische Waren-Entnahmen aus CCTV-Protokollen zur Berechnung dynamischer Meldebestände und Ausfallrisiken (95% Service-Garantie)</p>
+              </div>
+              
+              <!-- Interactive Confidence Selector -->
+              <div class="flex items-center gap-3 bg-zinc-950/60 p-1.5 rounded-lg border border-zinc-850 self-stretch sm:self-auto justify-between">
+                <span class="text-[9px] uppercase tracking-wider font-bold text-zinc-500 font-mono pl-1.5">Service-Level:</span>
+                <div class="flex gap-1 text-[10px] font-mono">
+                  <button 
+                    id="btnConfidence90"
+                    (click)="desiredConfidenceLevel = 90; renderChart()"
+                    class="px-2.5 py-1 rounded cursor-pointer transition-all"
+                    [class.bg-zinc-800]="desiredConfidenceLevel === 90"
+                    [class.text-zinc-100]="desiredConfidenceLevel === 90"
+                    [class.text-zinc-500]="desiredConfidenceLevel !== 90"
+                  >
+                    90% (Z=1.28)
+                  </button>
+                  <button 
+                    id="btnConfidence95"
+                    (click)="desiredConfidenceLevel = 95; renderChart()"
+                    class="px-2.5 py-1 rounded cursor-pointer transition-all"
+                    [class.bg-zinc-800]="desiredConfidenceLevel === 95"
+                    [class.text-zinc-100]="desiredConfidenceLevel === 95"
+                    [class.text-zinc-500]="desiredConfidenceLevel !== 95"
+                  >
+                    95% (Z=1.64)
+                  </button>
+                  <button 
+                    id="btnConfidence99"
+                    (click)="desiredConfidenceLevel = 99; renderChart()"
+                    class="px-2.5 py-1 rounded cursor-pointer transition-all"
+                    [class.bg-zinc-800]="desiredConfidenceLevel === 99"
+                    [class.text-zinc-100]="desiredConfidenceLevel === 99"
+                    [class.text-zinc-500]="desiredConfidenceLevel !== 99"
+                  >
+                    99% (Z=2.33)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Forecast Items Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              @for (forecast of probabilisticForecasts; track forecast.itemId) {
+                <div 
+                  [id]="'forecast-card-' + forecast.itemId"
+                  class="bg-zinc-900/40 border rounded-xl p-4 transition-all flex flex-col justify-between"
+                  [ngClass]="{
+                    'border-red-500/20 hover:border-red-500/40 bg-red-950/5': forecast.stockoutRisk >= 75,
+                    'border-amber-500/20 hover:border-amber-500/40 bg-amber-950/5': forecast.stockoutRisk >= 30 && forecast.stockoutRisk < 75,
+                    'border-zinc-800 hover:border-zinc-700 bg-zinc-900/20': forecast.stockoutRisk < 30
+                  }"
+                >
+                  <!-- Item info & Priority badge -->
+                  <div>
+                    <div class="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 class="text-xs font-semibold text-zinc-200 tracking-tight font-sans">{{ forecast.name }}</h4>
+                        <span class="text-[9px] font-mono text-zinc-500 block mt-0.5">{{ forecast.category }}</span>
+                      </div>
+                      <span 
+                        class="px-1.5 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider"
+                        [ngClass]="{
+                          'bg-red-500/10 text-red-400 border border-red-500/20 animate-pulse': forecast.stockoutRisk >= 75,
+                          'bg-amber-500/10 text-amber-400 border border-amber-500/20': forecast.stockoutRisk >= 30 && forecast.stockoutRisk < 75,
+                          'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20': forecast.stockoutRisk < 30
+                        }"
+                      >
+                        {{ forecast.stockoutRisk }}% RISIKO
+                      </span>
+                    </div>
+
+                    <!-- Current Stock details -->
+                    <div class="flex justify-between items-center text-[10px] text-zinc-400 mb-3 font-sans">
+                      <span>Aktueller Bestand:</span>
+                      <span class="font-mono text-zinc-200">
+                        <strong class="text-zinc-100 font-semibold">{{ forecast.stock }}</strong> / {{ forecast.unit }}
+                      </span>
+                    </div>
+
+                    <!-- Visual Progress indicator -->
+                    <div class="w-full h-1 bg-zinc-800 rounded-full overflow-hidden mb-4">
+                      <div 
+                        class="h-full rounded-full transition-all duration-300"
+                        [ngClass]="{
+                          'bg-red-500': forecast.stockoutRisk >= 75,
+                          'bg-amber-500': forecast.stockoutRisk >= 30 && forecast.stockoutRisk < 75,
+                          'bg-indigo-500': forecast.stockoutRisk < 30
+                        }"
+                        [style.width.%]="(forecast.stock / (forecast.reorderPoint * 2 || 40)) * 100"
+                      ></div>
+                    </div>
+
+                    <!-- Parameter Breakdown -->
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-[10px] font-mono text-zinc-500 border-t border-zinc-850/60 pt-3 mb-4">
+                      <div class="flex justify-between">
+                        <span>Tägl. Bedarf:</span>
+                        <span class="text-zinc-300">{{ forecast.dailyUsage }} / Tag</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Lieferzeit:</span>
+                        <span class="text-zinc-300">{{ forecast.leadTime }} Tage</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Sicherheitsreserve:</span>
+                        <span class="text-zinc-300">{{ forecast.safetyStock }} {{ forecast.unit }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Meldebestand (ROP):</span>
+                        <span class="text-zinc-300 font-semibold">{{ forecast.reorderPoint }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Action button / Reorder indicator -->
+                  <div class="flex items-center justify-between border-t border-zinc-850/60 pt-3">
+                    <span class="text-[9px] font-medium flex items-center gap-1 uppercase font-sans"
+                          [ngClass]="forecast.isReorderRecommended ? 'text-amber-400' : 'text-emerald-400'">
+                      <mat-icon class="text-xs">{{ forecast.isReorderRecommended ? 'error_outline' : 'check_circle_outline' }}</mat-icon>
+                      {{ forecast.isReorderRecommended ? 'NACHBESTELLUNG EMPFOHLEN' : 'BESTAND STABIL' }}
+                    </span>
+                    
+                    @if (forecast.isReorderRecommended) {
+                      <button 
+                        [id]="'btn-reorder-' + forecast.itemId"
+                        (click)="orderItem(forecast.itemId, forecast.suggestedReorderQty)" 
+                        class="px-2.5 py-1 text-[9px] bg-indigo-600 hover:bg-indigo-500 text-white rounded font-mono font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm shadow-indigo-600/10 border-none"
+                      >
+                        <mat-icon class="text-[11px] leading-none">shopping_cart</mat-icon> Order +{{ forecast.suggestedReorderQty }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+          }
+
+          <!-- Grid: Current Inventory & Events stream -->
+          @if (showInventoryEventsPanel) {
+            <div class="flex justify-between items-center bg-zinc-950/20 px-4 py-2.5 rounded-xl border border-zinc-850/60 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-zinc-300 font-mono">Echtzeit-Bestandsüberwachung & Ereignisstrom</span>
+              </div>
+              <button (click)="toggleInventoryEventsPanel()" class="text-zinc-500 hover:text-zinc-300 transition-colors flex items-center justify-center p-1 rounded hover:bg-zinc-800 cursor-pointer border-none bg-transparent" title="Bereich ausblenden">
+                <mat-icon class="text-xs">close</mat-icon>
+              </button>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left side: Current Stock Tracker Progress -->
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6 lg:col-span-7">
+              <div class="flex justify-between items-center mb-5">
+                <div>
+                  <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider">Aktuelle Bestandsüberwachung (Regalaudit)</h3>
+                  <p class="text-[10px] text-zinc-500 mt-0.5">Computer Vision berechnet Regalbefüllung in Echtzeit</p>
+                </div>
+                <button (click)="activeTab = 'inventory'" class="text-xs text-indigo-400 hover:text-indigo-300 hover:underline cursor-pointer">Alle anzeigen</button>
+              </div>
+
+              <div class="space-y-4">
+                @for (item of inventory; track item.id) {
+                  <div>
+                    <div class="flex justify-between items-center text-xs mb-1.5">
+                      <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full" [ngClass]="item.stock <= item.threshold ? 'bg-amber-400' : 'bg-indigo-400'"></span>
+                        <span class="text-zinc-200 font-medium">{{ item.name }}</span>
+                        <span class="text-[10px] text-zinc-500 font-mono">({{ item.location }})</span>
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <span class="font-mono text-zinc-100 font-semibold">{{ item.stock }}</span>
+                        <span class="text-zinc-500 text-[10px]">{{ item.unit }}</span>
+                        <span class="text-[10px] text-zinc-500 font-mono">/ Min: {{ item.threshold }}</span>
+                      </div>
+                    </div>
+                    <!-- Visual Progress Bar -->
+                    <div class="w-full h-1 rounded-full bg-zinc-850 overflow-hidden">
+                      <div 
+                        class="h-full rounded-full transition-all duration-500"
+                        [ngClass]="item.stock <= item.threshold ? 'bg-amber-500' : 'bg-indigo-500'"
+                        [style.width.%]="(item.stock / 60) * 100"
+                      ></div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Right side: Real-time Camera Event Stream Log -->
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6 lg:col-span-5 flex flex-col h-[400px]">
+              <div class="flex justify-between items-center mb-5 shrink-0">
+                <div>
+                  <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider">Intelligenter Ereignisfluss</h3>
+                  <p class="text-[10px] text-zinc-500 mt-0.5">Automatische Erfassungen des Edge-Neuronalprozessors</p>
+                </div>
+                <div class="flex items-center gap-1.5 text-[10px] font-mono text-indigo-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                  LIVE-FEED
+                </div>
+              </div>
+
+              <!-- Events scroll container -->
+              <div class="flex-1 overflow-y-auto space-y-3 pr-2">
+                @for (evt of filteredEvents; track evt.id) {
+                  <div class="p-3 rounded-lg border bg-zinc-900/10 border-zinc-850 hover:bg-zinc-900/50 hover:border-zinc-800 transition-all flex items-start gap-3">
+                    <!-- Type Badge -->
+                    <span class="mt-0.5 px-2 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider uppercase shrink-0"
+                          [ngClass]="{
+                            'bg-zinc-800 text-zinc-300 border border-zinc-700': evt.type === 'SISTEMA',
+                            'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20': evt.type === 'INGRESO',
+                            'bg-rose-500/10 text-rose-400 border border-rose-500/20': evt.type === 'EGRESO',
+                            'bg-amber-500/10 text-amber-400 border border-amber-500/20': evt.type === 'REUBICACION',
+                            'bg-red-500/10 text-red-400 border border-red-500/20 animate-pulse': evt.type === 'ALERTA'
+                          }">
+                      {{ evt.type === 'INGRESO' ? 'EINGANG' : evt.type === 'EGRESO' ? 'ENTNAHME' : evt.type === 'REUBICACION' ? 'UMLAGERUNG' : evt.type === 'ALERTA' ? 'WARNUNG' : evt.type === 'SISTEMA' ? 'SYSTEM' : evt.type }}
+                    </span>
+                    
+                    <div class="space-y-1 overflow-hidden flex-1">
+                      <div class="flex justify-between items-center">
+                        <p class="text-[10px] text-zinc-500 font-mono">{{ evt.camera }}</p>
+                        <p class="text-[10px] text-zinc-500 font-mono">{{ evt.timestamp }}</p>
+                      </div>
+                      <p class="text-xs text-zinc-300 font-sans leading-relaxed">{{ evt.description }}</p>
+                      <div class="flex justify-between items-center text-[10px] text-zinc-500 pt-1 font-sans">
+                        <span>Verantwortlich: <strong class="text-zinc-400 font-medium">{{ evt.operator }}</strong></span>
+                        @if (evt.items) {
+                          <span class="truncate max-w-[150px] italic text-indigo-400 font-mono"># {{ evt.items }}</span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+          </div>
+          }
+
+          <!-- Heatmap & Active Personnel Layout -->
+          @if (showHeatmapPersonnelPanel) {
+            <div class="flex justify-between items-center bg-zinc-950/20 px-4 py-2.5 rounded-xl border border-zinc-850/60 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-zinc-300 font-mono">Heatmap-Zonen & Personalaktivität</span>
+              </div>
+              <button (click)="toggleHeatmapPersonnelPanel()" class="text-zinc-500 hover:text-zinc-300 transition-colors flex items-center justify-center p-1 rounded hover:bg-zinc-800 cursor-pointer border-none bg-transparent" title="Bereich ausblenden">
+                <mat-icon class="text-xs">close</mat-icon>
+              </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            
+            <!-- Room Occupancy / Heatmap visualizer representation -->
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-5 md:p-6 md:col-span-8">
+              <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider mb-2">Betriebliche Heatmap-Darstellung (Verkehrsfrequenz)</h3>
+              <p class="text-[10px] text-zinc-500 mb-5">Prozentsatz der erfassten Bewegungen nach Lagerbereich in den letzten 24 Stunden</p>
+              
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3">
+                <div class="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3 sm:p-4 text-center">
+                  <span class="text-[9px] text-indigo-400 font-mono block">LADERAMPE</span>
+                  <span class="text-xl font-bold text-zinc-100 font-mono mt-1 block">84%</span>
+                  <span class="text-[9px] text-indigo-400/80 mt-1 block font-sans">Sehr hoch</span>
+                </div>
+                <div class="bg-zinc-800/40 border border-zinc-850 rounded-lg p-3 sm:p-4 text-center">
+                  <span class="text-[9px] text-zinc-400 font-mono block">REGALE A-B</span>
+                  <span class="text-xl font-bold text-zinc-100 font-mono mt-1 block">32%</span>
+                  <span class="text-[9px] text-zinc-500 mt-1 block font-sans">Normal</span>
+                </div>
+                <div class="bg-zinc-800/40 border border-zinc-850 rounded-lg p-3 sm:p-4 text-center">
+                  <span class="text-[9px] text-zinc-400 font-mono block">REGALE C-D</span>
+                  <span class="text-xl font-bold text-zinc-100 font-mono mt-1 block">56%</span>
+                  <span class="text-[9px] text-zinc-500 mt-1 block font-sans">Mäßig</span>
+                </div>
+                <div class="bg-zinc-850/20 border border-zinc-900 rounded-lg p-3 sm:p-4 text-center">
+                  <span class="text-[9px] text-zinc-500 font-mono block">ZENTRALER GANG</span>
+                  <span class="text-xl font-bold text-zinc-200 font-mono mt-1 block">15%</span>
+                  <span class="text-[9px] text-zinc-500 mt-1 block font-sans">Gering</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active staff tags -->
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6 md:col-span-4 flex flex-col justify-between">
+              <div>
+                <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider mb-2">Personal im Bereich</h3>
+                <p class="text-[10px] text-zinc-500 mb-4">Aktiv durch Kameras erfasste Personen</p>
+                
+                <div class="space-y-3">
+                  @for (p of people; track p.id) {
+                    <div class="flex items-center justify-between p-2 rounded-lg bg-zinc-900/10 border border-zinc-850 text-xs">
+                      <div>
+                        <p class="font-medium text-zinc-200">{{ p.name }}</p>
+                        <p class="text-[10px] text-zinc-500">{{ p.role }}</p>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-[10px] text-indigo-400 font-mono">{{ p.location }}</p>
+                        <p class="text-[9px] text-zinc-500 font-mono">{{ p.detectedAt }}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+          </div>
+          }
+
+        </div>
+      }
+
+      <!-- ========================================== -->
+      <!-- TAB 2: LIVE CAMERAS & IA SIMULATOR -->
+      <!-- ========================================== -->
+      @if (activeTab === 'camera') {
+        <div class="space-y-8 animate-fade-in">
+          
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Side: Interactive Live Camera Stream Simulator -->
+            <div class="lg:col-span-8 space-y-4">
+              
+              <!-- Camera Switcher -->
+              <div class="flex flex-col bg-zinc-900/30 border border-zinc-800 p-3 rounded-xl gap-3">
+                <div class="flex flex-wrap gap-2 w-full">
+                  <button 
+                    (click)="switchCamera('entrada')"
+                    [class.bg-indigo-600]="activeCamera === 'entrada'"
+                    [class.text-white]="activeCamera === 'entrada'"
+                    [class.bg-zinc-800/50]="activeCamera !== 'entrada'"
+                    [class.text-zinc-400]="activeCamera !== 'entrada'"
+                    class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                  >
+                    CAM_01: Haupteingang / Lobby
+                  </button>
+                  <button 
+                    (click)="switchCamera('cocina')"
+                    [class.bg-indigo-600]="activeCamera === 'cocina'"
+                    [class.text-white]="activeCamera === 'cocina'"
+                    [class.bg-zinc-800/50]="activeCamera !== 'cocina'"
+                    [class.text-zinc-400]="activeCamera !== 'cocina'"
+                    class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                  >
+                    CAM_02: Hauptküche
+                  </button>
+                  <button 
+                    (click)="switchCamera('lavanderia')"
+                    [class.bg-indigo-600]="activeCamera === 'lavanderia'"
+                    [class.text-white]="activeCamera === 'lavanderia'"
+                    [class.bg-zinc-800/50]="activeCamera !== 'lavanderia'"
+                    [class.text-zinc-400]="activeCamera !== 'lavanderia'"
+                    class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                  >
+                    CAM_03: Wäscherei
+                  </button>
+                  <button 
+                    (click)="switchCamera('bodega')"
+                    [class.bg-indigo-600]="activeCamera === 'bodega'"
+                    [class.text-white]="activeCamera === 'bodega'"
+                    [class.bg-zinc-800/50]="activeCamera !== 'bodega'"
+                    [class.text-zinc-400]="activeCamera !== 'bodega'"
+                    class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                  >
+                    CAM_04: Zentrallager
+                  </button>
+                  <button 
+                    (click)="switchCamera('muelle')"
+                    [class.bg-indigo-600]="activeCamera === 'muelle'"
+                    [class.text-white]="activeCamera === 'muelle'"
+                    [class.bg-zinc-800/50]="activeCamera !== 'muelle'"
+                    [class.text-zinc-400]="activeCamera !== 'muelle'"
+                    class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                  >
+                    CAM_05: Laderampe
+                  </button>
+                </div>
+
+                <div class="flex items-center justify-between text-xs font-mono text-zinc-300">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                    <span>Aktiviertes Signal:</span>
+                    <strong class="text-zinc-100">
+                      @if (activeCamera === 'entrada') { CAM_01: Haupteingang / Lobby }
+                      @else if (activeCamera === 'cocina') { CAM_02: Hauptküche / Kochbereich }
+                      @else if (activeCamera === 'lavanderia') { CAM_03: Wäscherei & Leinen }
+                      @else if (activeCamera === 'bodega') { CAM_04: Zentrallager }
+                      @else { CAM_05: Laderampe / Lieferungen }
+                    </strong>
+                  </div>
+                  <span class="text-[10px] text-zinc-500 hidden sm:inline">Neuronales Netzwerk: YOLOv10 & SAM2</span>
+                </div>
+              </div>
+
+              <!-- Interactive Camera Box overlay -->
+              <div class="relative aspect-video w-full rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800 shadow-[0_12px_36px_rgba(0,0,0,0.6)]">
+                <!-- Scanline effects -->
+                <div class="absolute inset-0 scanline-effect opacity-10 pointer-events-none"></div>
+
+                <!-- Laser Scanning line effect when scanning -->
+                @if (cameraScanning) {
+                  <div class="absolute inset-0 z-20 pointer-events-none">
+                    <!-- Scanner Laser Beam -->
+                    <div class="absolute left-0 right-0 h-1 bg-emerald-500 shadow-[0_0_15px_#10b981] animate-scanner-laser"></div>
+                    <!-- Full screen scanning green hue tint -->
+                    <div class="absolute inset-0 bg-emerald-500/5 animate-pulse"></div>
+                    <!-- Status watermark -->
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/90 text-emerald-400 font-mono text-[10px] tracking-[0.2em] uppercase py-2 px-4 rounded-md border border-emerald-500/30 shadow-2xl flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                      KI BILDANALYSE LÄUFT...
+                    </div>
+                  </div>
+                }
+
+                <!-- HUD: Last Detected Item Over the CCTV Stream -->
+                @if (lastDetectedItem) {
+                  <div class="absolute bottom-14 left-4 z-20 pointer-events-none max-w-sm bg-zinc-950/95 border border-zinc-800 rounded-lg p-3 shadow-2xl backdrop-blur-md animate-fade-in">
+                    <div class="flex items-center justify-between border-b border-zinc-850 pb-1.5 mb-1.5 gap-4">
+                      <div class="flex items-center gap-1.5 text-[9px] font-mono tracking-wider text-indigo-400">
+                        <span class="w-1 h-1 bg-indigo-400 rounded-full animate-ping"></span>
+                        OBJEKT ERFASST (CAM SCANNER)
+                      </div>
+                      <span class="text-[8px] font-mono text-zinc-500 shrink-0">{{ lastDetectedItem.timestamp }}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
+                        <mat-icon class="text-sm" [class.text-emerald-400]="lastDetectedItem.change > 0" [class.text-rose-400]="lastDetectedItem.change < 0">
+                          {{ lastDetectedItem.change > 0 ? 'add_shopping_cart' : 'remove_shopping_cart' }}
+                        </mat-icon>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="text-[11px] font-medium text-zinc-100 truncate">{{ lastDetectedItem.name }}</div>
+                        <div class="text-[9px] text-zinc-500 font-mono mt-0.5">{{ lastDetectedItem.camera }}</div>
+                      </div>
+                      <div class="text-right shrink-0">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold" [class.bg-emerald-500/15]="lastDetectedItem.change > 0" [class.text-emerald-400]="lastDetectedItem.change > 0" [class.bg-rose-500/15]="lastDetectedItem.change < 0" [class.text-rose-400]="lastDetectedItem.change < 0">
+                          {{ lastDetectedItem.change > 0 ? '+' : '' }}{{ lastDetectedItem.change }} {{ lastDetectedItem.unit }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                }
+                
+                <!-- grayscaled visual backgrounds representing cctv -->
+                @if (activeCamera === 'entrada') {
+                  <img src="/images/cctv_lobby_1783329079020.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Haupteingang Lobby" referrerpolicy="no-referrer">
+                } @else if (activeCamera === 'cocina') {
+                  <img src="/images/cctv_kitchen_1783329090247.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Hauptkueche" referrerpolicy="no-referrer">
+                } @else if (activeCamera === 'lavanderia') {
+                  <img src="/images/cctv_laundry_1783329102149.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Waescherei" referrerpolicy="no-referrer">
+                } @else if (activeCamera === 'bodega') {
+                  <img src="/images/cctv_bodega_1783329113440.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Lagerkamera" referrerpolicy="no-referrer">
+                } @else {
+                  <img src="/images/cctv_dock_1783329125542.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Laderampenkamera" referrerpolicy="no-referrer">
+                }
+
+                <!-- Calibration lines overlay -->
+                <div class="absolute inset-0 border border-zinc-800/30 pointer-events-none z-0"></div>
+                <div class="absolute top-1/2 left-0 right-0 h-px bg-zinc-800/10 pointer-events-none"></div>
+                <div class="absolute left-1/2 top-0 bottom-0 w-px bg-zinc-800/10 pointer-events-none"></div>
+
+                <!-- CCTV status indicators overlay -->
+                <div class="absolute inset-0 flex flex-col justify-between p-5 z-10 pointer-events-none">
+                  <div class="flex justify-between items-start">
+                    <div class="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-mono tracking-wider text-zinc-300 flex items-center gap-1.5 border border-zinc-800">
+                      <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                      REC [{{ 
+                        activeCamera === 'entrada' ? 'CAM_01_HAUPTEINGANG' :
+                        activeCamera === 'cocina' ? 'CAM_02_HAUPTKUECHE' :
+                        activeCamera === 'lavanderia' ? 'CAM_03_WAESCHEREI' :
+                        activeCamera === 'bodega' ? 'CAM_04_ZENTRALLAGER' : 'CAM_05_LADERAMPE'
+                      }}]
+                    </div>
+                    <div class="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-mono tracking-wider text-zinc-400 border border-zinc-800">
+                      FPS: 30.0 | RES: 1080P | LAT: 42ms
+                    </div>
+                  </div>
+                  
+                  <div class="flex justify-between items-end">
+                    <div class="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-mono text-zinc-500 border border-zinc-800">
+                      ISO: 400 | SHUTTER: 1/60s
+                    </div>
+                    <div class="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-mono text-zinc-300 border border-zinc-800">
+                      {{ getCurrentTime() }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Dynamic Bounding Boxes -->
+                @for (det of detections; track det.label) {
+                  <div 
+                    class="absolute border rounded pointer-events-none transition-all duration-300 flex flex-col justify-start"
+                    [ngClass]="det.color"
+                    [style.left.%]="det.x" 
+                    [style.top.%]="det.y" 
+                    [style.width.%]="det.w" 
+                    [style.height.%]="det.h"
+                  >
+                    <div class="bg-black/85 px-1.5 py-0.5 text-[9px] font-mono tracking-wider uppercase border-b border-inherit truncate text-white">
+                      {{ det.label }}
+                    </div>
+                  </div>
+                }
+
+                <!-- Scanning animation beam overlay during simulation -->
+                @if (isSimulating) {
+                  <div class="absolute top-0 left-0 right-0 h-0.5 bg-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.8)] animate-[scanline_2s_infinite_ease-in-out] pointer-events-none z-10"></div>
+                  <div class="absolute inset-0 bg-indigo-500/5 animate-pulse-slow pointer-events-none"></div>
+                }
+              </div>
+
+              <!-- Real-time Algorithm Inspector Panel -->
+              <div class="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                  <div class="flex items-center gap-2">
+                    <mat-icon class="text-indigo-400">psychology</mat-icon>
+                    <div>
+                      <h4 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider">Neuronaler Pipeline-Inspektor</h4>
+                      <p class="text-[10px] text-zinc-500 font-sans">Echtzeit-Analyse der Computervisions-Modelle</p>
+                    </div>
+                  </div>
+                  <button 
+                    (click)="showAlgorithmInspector = !showAlgorithmInspector"
+                    class="px-2.5 py-1 rounded-md text-[10px] font-mono tracking-wider cursor-pointer transition-all border border-zinc-700 hover:bg-zinc-800 text-zinc-300"
+                  >
+                    {{ showAlgorithmInspector ? 'VERBERGEN' : 'ANZEIGEN' }}
+                  </button>
+                </div>
+
+                @if (showAlgorithmInspector) {
+                  <div class="grid grid-cols-1 md:grid-cols-12 gap-5 text-xs font-mono">
+                    
+                    <!-- GPU / Latency / Performance Metrics (col-span-4) -->
+                    <div class="md:col-span-4 space-y-3 bg-zinc-950/40 p-4 rounded-xl border border-zinc-850">
+                      <div class="text-[10px] text-zinc-500 uppercase tracking-wider mb-2 font-semibold">Sensor-Messwerte</div>
+                      
+                      <!-- GPU load -->
+                      <div>
+                        <div class="flex justify-between text-[10px] text-zinc-300 mb-1">
+                          <span>GPU-Auslastung</span>
+                          <span class="text-emerald-400 font-bold">{{ pipelineMetrics.gpuLoad }}%</span>
+                        </div>
+                        <div class="h-1 w-full bg-zinc-900 rounded-full overflow-hidden">
+                          <div class="h-full bg-emerald-500 transition-all duration-300" [style.width.%]="pipelineMetrics.gpuLoad"></div>
+                        </div>
+                      </div>
+
+                      <!-- VRAM allocation -->
+                      <div>
+                        <div class="flex justify-between text-[10px] text-zinc-300 mb-1">
+                          <span>VRAM-Belegung</span>
+                          <span class="text-indigo-400 font-bold">{{ pipelineMetrics.vram }} GB / 8.0 GB</span>
+                        </div>
+                        <div class="h-1 w-full bg-zinc-900 rounded-full overflow-hidden">
+                          <div class="h-full bg-indigo-500 transition-all duration-300" [style.width.%]="(pipelineMetrics.vram / 8.0) * 100"></div>
+                        </div>
+                      </div>
+
+                      <!-- Latency -->
+                      <div class="flex justify-between items-center text-[10px] border-t border-zinc-900 pt-2 text-zinc-400">
+                        <span>Latenzzeit:</span>
+                        <span class="text-rose-400 font-bold">{{ pipelineMetrics.latency }} ms</span>
+                      </div>
+
+                      <!-- FPS -->
+                      <div class="flex justify-between items-center text-[10px] text-zinc-400">
+                        <span>Frame-Rate:</span>
+                        <span class="text-yellow-500 font-bold">{{ pipelineMetrics.fps }} FPS</span>
+                      </div>
+                    </div>
+
+                    <!-- Neural Map Activation Grid (col-span-4) -->
+                    <div class="md:col-span-4 space-y-2 bg-zinc-950/40 p-4 rounded-xl border border-zinc-850">
+                      <div class="flex items-center justify-between text-[10px] text-zinc-500 uppercase tracking-wider mb-1 font-semibold">
+                        <span>Feature-Aktivierung</span>
+                        <span class="text-[9px] text-indigo-400 animate-pulse">AKTIV</span>
+                      </div>
+                      <p class="text-[9px] text-zinc-500 font-sans leading-relaxed mb-2">Visualisierung der Faltungsschichten (Feature Maps) des Netzes.</p>
+                      
+                      <!-- Activation Grid: 32 boxes -->
+                      <div class="grid grid-cols-8 gap-1 pt-1">
+                        @for (val of pipelineMetrics.activeFilters; track $index) {
+                          <div 
+                            class="aspect-square rounded-[2px] transition-all duration-300 border border-zinc-800"
+                            [style.background-color]="isSimulating ? 'rgba(99, 102, 241, ' + (val/100) + ')' : 'rgba(16, 185, 129, ' + (val/100) + ')'"
+                            [title]="'Filter ' + $index + ' Intensität: ' + (val | number:'1.0-1') + '%'"
+                          ></div>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- Active Model & Layer Info (col-span-4) -->
+                    <div class="md:col-span-4 space-y-2.5 bg-zinc-950/40 p-4 rounded-xl border border-zinc-850 flex flex-col justify-between">
+                      <div>
+                        <div class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1 font-semibold">Aktiver Algorithmus</div>
+                        <div class="text-indigo-400 font-bold text-[11px] leading-snug break-words">
+                          {{ pipelineMetrics.activeModel }}
+                        </div>
+                      </div>
+
+                      <div class="border-t border-zinc-900 pt-2 space-y-1">
+                        <div class="flex justify-between text-[9px] text-zinc-500">
+                          <span>Tensor-Eingangsform:</span>
+                        </div>
+                        <div class="text-zinc-300 text-[10px] bg-zinc-900/60 p-1.5 rounded border border-zinc-800 text-center font-mono select-all">
+                          {{ pipelineMetrics.tensorShape }}
+                        </div>
+                      </div>
+
+                      <div class="text-[9px] text-zinc-500 font-sans leading-relaxed">
+                        Das Video-Signal wird in Tensor-Matrizen zerlegt, normalisiert und durch tiefe CNN-Schichten geschleust.
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- Live Stream Coordinates Overlay table -->
+                  <div class="bg-zinc-950/20 border border-zinc-850/60 rounded-xl p-3.5 mt-2 font-mono text-[10px]">
+                    <div class="flex items-center justify-between text-[10px] text-zinc-500 uppercase tracking-wider border-b border-zinc-900 pb-2 mb-2 font-semibold">
+                      <span>Aktive Objekt-Koordinaten & Token (Segmentierung)</span>
+                      <span class="text-zinc-500 text-[9px]">Filter: Alle Objekte</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                      <table class="w-full text-left text-zinc-400 border-collapse">
+                        <thead>
+                          <tr class="border-b border-zinc-900 text-zinc-500 font-semibold text-[9px]">
+                            <th class="py-1">Objekt-Klasse (Label)</th>
+                            <th class="py-1">Vertrauenswert (Confidence)</th>
+                            <th class="py-1">Bounding-Box [X, Y, W, H]</th>
+                            <th class="py-1">Tracking Token</th>
+                            <th class="py-1 text-right">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @if (detections.length === 0) {
+                            <tr>
+                              <td colspan="5" class="py-3 text-center text-zinc-600 font-sans">
+                                Keine aktiven Detections auf diesem Signal. Wechseln Sie die Kamera oder starten Sie eine Simulation.
+                              </td>
+                            </tr>
+                          } @else {
+                            @for (det of detections; track det.label) {
+                              <tr class="border-b border-zinc-900/40 hover:bg-zinc-900/20 transition-colors">
+                                <td class="py-1.5 font-sans font-medium text-zinc-200 flex items-center gap-1.5">
+                                  <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                                  {{ det.label.split('[')[0].trim() }}
+                                </td>
+                                <td class="py-1.5 text-indigo-400 font-semibold">
+                                  @if (det.label.includes('[')) {
+                                    {{ det.label.substring(det.label.indexOf('[') + 1, det.label.indexOf(']')) }}
+                                  } @else {
+                                    98.5%
+                                  }
+                                </td>
+                                <td class="py-1.5 text-zinc-500 text-[9px]">
+                                  [{{ det.x }}%, {{ det.y }}%, {{ det.w }}%, {{ det.h }}%]
+                                </td>
+                                <td class="py-1.5 text-zinc-400 text-[9px]">
+                                  @if (det.label.includes('Sarah Connor')) {
+                                    <span class="bg-indigo-900/30 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-800/30 font-mono text-[9px]">TOKEN_ID_CONNOR</span>
+                                  } @else if (det.label.includes('Carlos M.')) {
+                                    <span class="bg-emerald-900/30 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-800/30 font-mono text-[9px]">TOKEN_ID_MENDOZA</span>
+                                  } @else if (det.label.includes('Fahrzeug')) {
+                                    <span class="bg-blue-900/30 text-blue-400 px-1.5 py-0.5 rounded border border-blue-800/30 font-mono text-[9px]">ALPR_HH_MB_2026</span>
+                                  } @else {
+                                    <span class="bg-zinc-800/40 text-zinc-400 px-1.5 py-0.5 rounded border border-zinc-700/30 font-mono text-[9px]">OBJ_TRK_{{ $index + 101 }}</span>
+                                  }
+                                </td>
+                                <td class="py-1.5 text-right">
+                                  <span class="px-1.5 py-0.5 rounded text-[8px] bg-emerald-950/40 text-emerald-400 border border-emerald-900/30">VERIFIZIERT</span>
+                                </td>
+                              </tr>
+                            }
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                @}
+              </div>
+
+            </div>
+
+            <!-- Right Side: Simulation Control Panel & CV Logger -->
+            <div class="lg:col-span-4 space-y-6 flex flex-col">
+              
+              <!-- NEW: Real-Time Automatic Scanner Loop Card -->
+              <div class="bg-indigo-950/20 border border-indigo-500/30 rounded-xl p-5 shadow-[0_4px_20px_rgba(79,70,229,0.1)]">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center gap-2">
+                    <mat-icon [class.text-emerald-400]="isAutoScanning" [class.text-zinc-500]="!isAutoScanning" [class.animate-pulse]="isAutoScanning">sync</mat-icon>
+                    <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider">Fortlaufender KI-Scanner</h3>
+                  </div>
+                  <span class="px-2 py-0.5 rounded text-[8px] font-mono" [class.bg-emerald-500/15]="isAutoScanning" [class.text-emerald-400]="isAutoScanning" [class.bg-zinc-800]="!isAutoScanning" [class.text-zinc-400]="!isAutoScanning">
+                    {{ isAutoScanning ? 'AKTIV' : 'STANDBY' }}
+                  </span>
+                </div>
+                <p class="text-[10.5px] text-zinc-400 mb-4 font-sans leading-relaxed">
+                  Aktivieren Sie das KI-Scannersystem, um einen automatischen Kamerasuchlauf zu starten. Die Kameras erfassen physische Ein- und Ausgänge von Produkten live, berechnen die Mengenänderungen und aktualisieren das Inventar in Echtzeit.
+                </p>
+                <button 
+                  (click)="toggleAutoScan()"
+                  [disabled]="isSimulating"
+                  [class.bg-emerald-600]="isAutoScanning"
+                  [class.hover:bg-emerald-500]="isAutoScanning"
+                  [class.bg-indigo-600]="!isAutoScanning"
+                  [class.hover:bg-indigo-500]="!isAutoScanning"
+                  class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-xs font-medium text-white transition-all cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <mat-icon class="text-sm w-4 h-4">{{ isAutoScanning ? 'pause' : 'play_arrow' }}</mat-icon>
+                  {{ isAutoScanning ? 'KI-Scanner Deaktivieren' : 'KI-Scanner Starten' }}
+                </button>
+              </div>
+
+              <!-- Simulation Launchers -->
+              <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6">
+                <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider mb-2">Automatisierte Betriebskontrolle</h3>
+                <p class="text-[11px] text-zinc-500 mb-5 font-sans">Simulieren Sie physische Bewegungen in verschiedenen Hotelbereichen. Das integrierte Multi-Kamera-System analysiert die Bilder, führt alle Berechnungen durch und steuert die Prozesse autonom.</p>
+                
+                <div class="space-y-2.5">
+                  <button 
+                    (click)="runSimulation('guest_arrival')"
+                    [disabled]="isSimulating"
+                    class="w-full flex items-center justify-between p-3 rounded-lg text-left text-xs bg-zinc-950/40 border border-zinc-850 hover:border-indigo-500/30 hover:bg-zinc-900/40 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div class="flex items-center gap-3">
+                      <mat-icon class="text-emerald-400">vpn_key</mat-icon>
+                      <div>
+                        <strong class="text-zinc-200 block font-medium">Gästeankunft & Check-In</strong>
+                        <span class="text-[10px] text-zinc-500">Haupteingang (CAM_01) • Gast-Zuweisung</span>
+                      </div>
+                    </div>
+                    <mat-icon class="text-zinc-600 group-hover:text-emerald-400 transition-colors">play_arrow</mat-icon>
+                  </button>
+
+                  <button 
+                    (click)="runSimulation('chef_withdrawal')"
+                    [disabled]="isSimulating"
+                    class="w-full flex items-center justify-between p-3 rounded-lg text-left text-xs bg-zinc-950/40 border border-zinc-850 hover:border-indigo-500/30 hover:bg-zinc-900/40 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div class="flex items-center gap-3">
+                      <mat-icon class="text-indigo-400">restaurant</mat-icon>
+                      <div>
+                        <strong class="text-zinc-200 block font-medium">Küchenchef bereitet Abendessen</strong>
+                        <span class="text-[10px] text-zinc-500">Hauptküche (CAM_02) • Zutatensegmentierung</span>
+                      </div>
+                    </div>
+                    <mat-icon class="text-zinc-600 group-hover:text-indigo-400 transition-colors">play_arrow</mat-icon>
+                  </button>
+
+                  <button 
+                    (click)="runSimulation('laundry_cycle')"
+                    [disabled]="isSimulating"
+                    class="w-full flex items-center justify-between p-3 rounded-lg text-left text-xs bg-zinc-950/40 border border-zinc-850 hover:border-indigo-500/30 hover:bg-zinc-900/40 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div class="flex items-center gap-3">
+                      <mat-icon class="text-indigo-400">local_laundry_service</mat-icon>
+                      <div>
+                        <strong class="text-zinc-200 block font-medium">Desinfektion & Leinentracking</strong>
+                        <span class="text-[10px] text-zinc-500">Wäscherei (CAM_03) • Waschmittelfüllung & Handtücher</span>
+                      </div>
+                    </div>
+                    <mat-icon class="text-zinc-600 group-hover:text-indigo-400 transition-colors">play_arrow</mat-icon>
+                  </button>
+
+                  <button 
+                    (click)="runSimulation('item_relocation')"
+                    [disabled]="isSimulating"
+                    class="w-full flex items-center justify-between p-3 rounded-lg text-left text-xs bg-zinc-950/40 border border-zinc-850 hover:border-indigo-500/30 hover:bg-zinc-900/40 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div class="flex items-center gap-3">
+                      <mat-icon class="text-indigo-400">sync_alt</mat-icon>
+                      <div>
+                        <strong class="text-zinc-200 block font-medium">Interne Kastenumlagerung</strong>
+                        <span class="text-[10px] text-zinc-500">Zentrallager (CAM_04) • ByteTrack-Ortung</span>
+                      </div>
+                    </div>
+                    <mat-icon class="text-zinc-600 group-hover:text-indigo-400 transition-colors">play_arrow</mat-icon>
+                  </button>
+
+                  <button 
+                    (click)="runSimulation('supplier_arrival')"
+                    [disabled]="isSimulating"
+                    class="w-full flex items-center justify-between p-3 rounded-lg text-left text-xs bg-zinc-950/40 border border-zinc-850 hover:border-indigo-500/30 hover:bg-zinc-900/40 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div class="flex items-center gap-3">
+                      <mat-icon class="text-indigo-400">local_shipping</mat-icon>
+                      <div>
+                        <strong class="text-zinc-200 block font-medium">Lieferantenankunft an Rampe</strong>
+                        <span class="text-[10px] text-zinc-500">Laderampe (CAM_05) • Multimodale Barcode-Erfassung</span>
+                      </div>
+                    </div>
+                    <mat-icon class="text-zinc-600 group-hover:text-indigo-400 transition-colors">play_arrow</mat-icon>
+                  </button>
+
+                  <div class="pt-2">
+                    <button 
+                      (click)="runSimulation('reset')"
+                      [disabled]="isSimulating"
+                      class="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-xs font-mono text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/30 transition-all cursor-pointer"
+                    >
+                      <mat-icon class="text-sm w-4 h-4 text-zinc-400">restart_alt</mat-icon>
+                      Gesamtsystem zurücksetzen
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Computer Vision Processing Console -->
+              <div class="bg-[#0C0C0E] border border-zinc-800 rounded-xl p-5 font-mono flex-1 min-h-[220px] flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between text-[11px] text-zinc-500 border-b border-zinc-850 pb-2 mb-3">
+                    <span>VISION-KI-TELEMETRIE</span>
+                    <span [class.text-indigo-400]="isSimulating" [class.text-zinc-600]="!isSimulating" class="flex items-center gap-1 text-[9px]">
+                      <span class="w-1.5 h-1.5 rounded-full bg-current" [class.animate-pulse]="isSimulating"></span>
+                      {{ isSimulating ? 'INFERENZ AKTIV' : 'STANDBY' }}
+                    </span>
+                  </div>
+
+                  <!-- Logs Output container -->
+                  <div class="space-y-2 text-[10px] text-zinc-400 max-h-[160px] overflow-y-auto">
+                    @if (simulationLogs.length === 0) {
+                      <div class="text-zinc-600 text-center py-4 font-sans">
+                        Warte auf Ereignis... Wählen Sie oben eine Betriebssimulation aus, um den neuronalen Fluss zu auditieren.
+                      </div>
+                    } @else {
+                      @for (log of simulationLogs; track log) {
+                        <div class="leading-relaxed border-l-2 border-indigo-500 pl-2 py-0.5 bg-zinc-900/10 rounded-r font-mono">
+                          {{ log }}
+                        </div>
+                      }
+                    }
+                  </div>
+                </div>
+
+                <!-- Simulation Progress Indicator -->
+                @if (isSimulating) {
+                  <div class="mt-4 pt-3 border-t border-zinc-850">
+                    <div class="flex justify-between text-[10px] text-zinc-500 mb-1">
+                      <span>INFERENZEN WERDEN VERARBEITET</span>
+                      <span>{{ simulationProgress }}%</span>
+                    </div>
+                    <div class="w-full h-1 bg-zinc-900 rounded-full overflow-hidden">
+                      <div class="h-full bg-indigo-500 rounded-full transition-all duration-350" [style.width.%]="simulationProgress"></div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- NEW: Live Camera Scanned Detections History Feed -->
+              <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-5 flex flex-col">
+                <div class="flex items-center justify-between text-xs font-semibold text-zinc-100 uppercase tracking-wider mb-3 pb-2 border-b border-zinc-850">
+                  <div class="flex items-center gap-2">
+                    <mat-icon class="text-indigo-400">history_edu</mat-icon>
+                    <span>Echtzeit-Scannverlauf</span>
+                  </div>
+                  <span class="text-[9px] font-mono text-zinc-500 font-normal">MAX. 15 DETEKTIONEN</span>
+                </div>
+
+                <div class="space-y-2.5 max-h-[250px] overflow-y-auto pr-1">
+                  @if (detectedItemsLog.length === 0) {
+                    <div class="text-[11px] text-zinc-600 text-center py-8 font-sans">
+                      Noch keine Live-Scans erfasst.<br>
+                      Aktivieren Sie den <span class="text-indigo-400">Fortlaufenden KI-Scanner</span> oben, um Bestandsänderungen in Echtzeit aufzuzeichnen.
+                    </div>
+                  } @else {
+                    @for (log of detectedItemsLog; track log.timestamp) {
+                      <div class="flex items-center justify-between p-2 rounded bg-zinc-950/40 border border-zinc-850/50 hover:border-zinc-800 transition-all animate-fade-in">
+                        <div class="flex items-center gap-2 min-w-0">
+                          <span class="w-1.5 h-1.5 rounded-full shrink-0" [class.bg-emerald-500]="log.change > 0" [class.bg-rose-500]="log.change < 0"></span>
+                          <div class="min-w-0">
+                            <div class="text-[10px] font-medium text-zinc-200 truncate">{{ log.name }}</div>
+                            <div class="text-[8px] text-zinc-500 font-mono mt-0.5">{{ log.camera }} • {{ log.timestamp }}</div>
+                          </div>
+                        </div>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-mono shrink-0 font-bold" [class.bg-emerald-500/10]="log.change > 0" [class.text-emerald-400]="log.change > 0" [class.bg-rose-500/10]="log.change < 0" [class.text-rose-400]="log.change < 0">
+                          {{ log.change > 0 ? '+' : '' }}{{ log.change }}
+                        </span>
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      }
+
+      <!-- ========================================== -->
+      <!-- TAB 3: INVENTORY AND ACCESS TABLES -->
+      <!-- ========================================== -->
+      @if (activeTab === 'inventory') {
+        <div class="space-y-8 animate-fade-in">
+          
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+            
+            <!-- Left Side: Comprehensive Inventory Table -->
+            <div class="xl:col-span-8 bg-zinc-900/30 border border-zinc-800 rounded-xl p-6">
+              <div class="flex justify-between items-center mb-5">
+                <div>
+                  <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider">Bestandsdatenbank</h3>
+                  <p class="text-[10px] text-zinc-500 mt-0.5">Automatisierte Synchronisierung über IP-Audit-Kameras</p>
+                </div>
+                <div class="text-[10px] bg-zinc-950 px-2.5 py-1 rounded border border-zinc-800 text-zinc-400 font-mono">
+                  Produkte insgesamt: {{ inventory.length }}
+                </div>
+              </div>
+
+              <!-- Inventory Table container -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-zinc-300 border border-zinc-850 rounded-lg overflow-hidden">
+                  <thead>
+                     <tr class="bg-zinc-950/80 text-zinc-400 font-mono tracking-wider border-b border-zinc-800">
+                      <th class="px-2 sm:px-4 py-3">ID</th>
+                      <th class="px-2 sm:px-4 py-3">Artikel</th>
+                      <th class="px-2 sm:px-4 py-3 hidden sm:table-cell">Kategorie</th>
+                      <th class="px-2 sm:px-4 py-3 text-center">Bestand</th>
+                      <th class="px-2 sm:px-4 py-3 text-center">Minimum</th>
+                      <th class="px-2 sm:px-4 py-3 hidden sm:table-cell">Registrierter Standort</th>
+                      <th class="px-2 sm:px-4 py-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                     @for (item of inventory; track item.id) {
+                      <tr class="border-b border-zinc-850 hover:bg-zinc-800/20 transition-colors">
+                        <td class="px-2 sm:px-4 py-3.5 font-mono text-[11px] text-zinc-500">#00{{ item.id }}</td>
+                        <td class="px-2 sm:px-4 py-3.5">
+                          <strong class="text-zinc-200 block font-medium">{{ item.name }}</strong>
+                          <span class="text-[10px] text-zinc-500 font-sans block sm:hidden">Ort: {{ item.location }}</span>
+                          <span class="text-[10px] text-zinc-500 font-sans">1 unit = 1 {{ item.unit }}</span>
+                        </td>
+                        <td class="px-2 sm:px-4 py-3.5 text-zinc-400 hidden sm:table-cell">{{ item.category }}</td>
+                        <td class="px-2 sm:px-4 py-3.5 text-center font-semibold font-mono" [class.text-amber-400]="item.stock <= item.threshold">
+                          {{ item.stock }}
+                        </td>
+                        <td class="px-2 sm:px-4 py-3.5 text-center font-mono text-zinc-500">{{ item.threshold }}</td>
+                        <td class="px-2 sm:px-4 py-3.5 text-zinc-300 hidden sm:table-cell">
+                          <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-zinc-900/60 text-[10px] border border-zinc-800">
+                            <mat-icon class="text-[10px] w-3 h-3 text-indigo-400">place</mat-icon>
+                            {{ item.location }}
+                          </span>
+                        </td>
+                        <td class="px-2 sm:px-4 py-3.5">
+                          @if (item.stock <= item.threshold) {
+                            <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">AUFFÜLLEN</span>
+                          } @else {
+                            <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">STABIL</span>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right Side: Active Credentials / Access control -->
+            <div class="xl:col-span-4 bg-zinc-900/30 border border-zinc-800 rounded-xl p-6">
+              <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider mb-2">Mitarbeiter-Ausweiskontrolle</h3>
+              <p class="text-[10px] text-zinc-500 mb-5">Automatische Zutrittsvalidierung verknüpft mit den Aufzeichnungen der Vision-KI</p>
+
+              <div class="space-y-4">
+                @for (p of people; track p.id) {
+                  <div class="p-4 rounded-xl bg-zinc-950/40 border border-zinc-850 space-y-3">
+                    <div class="flex justify-between items-start">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center font-bold text-xs text-white">
+                          {{ p.name.substring(0,1) }}
+                        </div>
+                        <div>
+                          <h4 class="text-xs font-semibold text-zinc-200">{{ p.name }}</h4>
+                          <p class="text-[10px] text-zinc-500">{{ p.role }}</p>
+                        </div>
+                      </div>
+                      <span class="text-[9px] font-mono bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 font-semibold">AUTORISIERT</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-[10px] font-mono border-t border-zinc-850 pt-3">
+                      <div>
+                        <span class="text-zinc-500 block">DIENSTAUSWEIS</span>
+                        <span class="text-zinc-300 font-mono">{{ p.badge }}</span>
+                      </div>
+                      <div>
+                        <span class="text-zinc-500 block">LETZTE ERFASSUNG</span>
+                        <span class="text-zinc-300">{{ p.location }} ({{ p.detectedAt }})</span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+          </div>
+
+          <!-- AI Prediction & Reorder Dates Panel -->
+          <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6 mt-8 space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-zinc-800">
+              <div>
+                <span class="px-2 py-0.5 text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded font-mono font-bold tracking-wider">INTELLIGENTES MONITORING</span>
+                <h3 class="text-base font-bold text-zinc-100 tracking-wide mt-1.5">KI-Bedarfsprognose & Nachbestell-Optimierung</h3>
+                <p class="text-[10px] text-zinc-500">
+                  Prädiktive Trendanalyse basierend auf historischen Wareneingangs- und Entnahmedaten im Zentrallager.
+                </p>
+              </div>
+
+              <!-- Occupancy rate controller -->
+              <div class="flex items-center gap-4 bg-zinc-950/60 p-3 rounded-xl border border-zinc-850">
+                <div class="space-y-1">
+                  <span class="text-[9px] text-zinc-400 font-mono block uppercase">Hotel-Auslastung (Belegung)</span>
+                  <div class="flex items-center gap-2">
+                    <input 
+                      type="range" 
+                      min="10" 
+                      max="150" 
+                      [value]="occupancyRate" 
+                      (input)="updateOccupancyRate(+$any($event.target).value)"
+                      class="w-32 accent-indigo-500 h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <span class="text-xs font-mono font-bold text-indigo-400">{{ occupancyRate }}%</span>
+                  </div>
+                </div>
+                <div class="text-[9px] border-l border-zinc-800 pl-4 font-mono text-zinc-500 space-y-0.5">
+                  <div>Bezugsrate: <span class="text-zinc-300 font-bold">75% (Basis)</span></div>
+                  <div>Verbrauchsmultiplikator: <span class="text-zinc-300 font-bold">{{ (occupancyRate / 75) | number:'1.2-2' }}x</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table of Predictions -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-zinc-300 border border-zinc-850 rounded-lg overflow-hidden">
+                <thead>
+                  <tr class="bg-zinc-950/80 text-zinc-400 font-mono tracking-wider border-b border-zinc-800">
+                    <th class="px-4 py-3">Kritischer Artikel</th>
+                    <th class="px-4 py-3 hidden md:table-cell">Kategorie</th>
+                    <th class="px-4 py-3 text-right">Menge</th>
+                    <th class="px-4 py-3 text-right">Verbrauchsrate / Tag</th>
+                    <th class="px-4 py-3 text-center">Tage bis Mindestbestand</th>
+                    <th class="px-4 py-3 text-center">Tage bis Leerstand</th>
+                    <th class="px-4 py-3 text-center">Empf. Nachbestelldatum</th>
+                    <th class="px-4 py-3 text-center">Status</th>
+                    <th class="px-4 py-3 text-center">Aktion</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @if (predictionLoading) {
+                    <tr>
+                      <td colspan="9" class="px-4 py-10 text-center text-zinc-500 font-mono">
+                        <div class="flex items-center justify-center gap-2">
+                          <span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
+                          <span>Analysiere historische Trends und Inferenzdaten...</span>
+                        </div>
+                      </td>
+                    </tr>
+                  } @else {
+                    @for (pred of predictions; track pred.itemId) {
+                      <tr class="border-b border-zinc-850 hover:bg-zinc-800/20 transition-all duration-300">
+                        <!-- Name & ID -->
+                        <td class="px-4 py-3.5">
+                          <div class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full"
+                                  [ngClass]="pred.priority === 'CRITICAL' ? 'bg-rose-500 shadow-md shadow-rose-500/50' : pred.priority === 'WARNING' ? 'bg-amber-500' : 'bg-emerald-500'"></span>
+                            <div>
+                              <strong class="text-zinc-200 block font-medium">{{ pred.name }}</strong>
+                              <span class="text-[9px] text-zinc-500 font-mono">ID: #00{{ pred.itemId }} | Mindest: {{ pred.threshold }} {{ pred.unit }}</span>
+                            </div>
+                          </div>
+                        </td>
+
+                        <!-- Category -->
+                        <td class="px-4 py-3.5 text-zinc-400 hidden md:table-cell">{{ pred.category }}</td>
+
+                        <!-- Stock level -->
+                        <td class="px-4 py-3.5 text-right font-mono font-bold"
+                            [ngClass]="pred.stock <= pred.threshold ? 'text-rose-400' : 'text-zinc-300'">
+                          {{ pred.stock }} <span class="text-[10px] font-sans font-normal text-zinc-500">{{ pred.unit }}</span>
+                        </td>
+
+                        <!-- Usage speed -->
+                        <td class="px-4 py-3.5 text-right font-mono text-indigo-400 font-medium">
+                          ~{{ pred.dailyUsage | number:'1.1-2' }} <span class="text-[10px] text-zinc-500 font-sans font-normal">/ Tag</span>
+                        </td>
+
+                        <!-- Days left to threshold -->
+                        <td class="px-4 py-3.5 text-center font-mono">
+                          @if (pred.daysToThreshold === 0) {
+                            <span class="text-rose-400 font-bold font-mono">Kritisch (&lt;0d)</span>
+                          } @else if (pred.daysToThreshold > 100) {
+                            <span class="text-zinc-500">Keine</span>
+                          } @else {
+                            <span [ngClass]="pred.daysToThreshold <= 3 ? 'text-rose-400 font-bold' : pred.daysToThreshold <= 7 ? 'text-amber-400' : 'text-zinc-300'">
+                              {{ pred.daysToThreshold }} Tage
+                            </span>
+                          }
+                        </td>
+
+                        <!-- Days left to total depletion -->
+                        <td class="px-4 py-3.5 text-center font-mono">
+                          @if (pred.daysToEmpty > 100) {
+                            <span class="text-zinc-500">Stabil (&gt;100d)</span>
+                          } @else {
+                            <span [ngClass]="pred.daysToEmpty <= 3 ? 'text-rose-500 font-bold' : pred.daysToEmpty <= 7 ? 'text-amber-500' : 'text-zinc-400'">
+                              {{ pred.daysToEmpty }} Tage
+                            </span>
+                          }
+                        </td>
+
+                        <!-- Recommended reorder date -->
+                        <td class="px-4 py-3.5 text-center font-mono">
+                          <span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono"
+                                [ngClass]="pred.priority === 'CRITICAL' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : pred.priority === 'WARNING' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-zinc-950 text-zinc-400 border border-zinc-800'">
+                            {{ pred.reorderDate }}
+                          </span>
+                        </td>
+
+                        <!-- Priority badge -->
+                        <td class="px-4 py-3.5 text-center">
+                          <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold tracking-wider"
+                                [ngClass]="pred.priority === 'CRITICAL' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : pred.priority === 'WARNING' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'">
+                            {{ pred.priority }}
+                          </span>
+                        </td>
+
+                        <!-- Trigger Simulated Order -->
+                        <td class="px-4 py-3.5 text-center">
+                          <button 
+                            (click)="orderItem(pred.itemId, pred.reorderQty)"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-3 py-1.5 rounded-lg text-[10px] font-sans tracking-wide cursor-pointer transition-all flex items-center gap-1.5 mx-auto"
+                          >
+                            <mat-icon class="text-xs w-3.5 h-3.5">shopping_cart</mat-icon>
+                            Nachbestellen (+{{ pred.reorderQty }})
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Mathematical background / Analytical note -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-zinc-950/40 p-4 border border-zinc-850 rounded-xl text-[11px] leading-relaxed">
+              <div class="space-y-2 font-sans text-zinc-400">
+                <div class="flex items-center gap-2">
+                  <mat-icon class="text-indigo-400 text-sm">analytics</mat-icon>
+                  <span class="font-bold text-zinc-300 uppercase tracking-wider text-[10px]">Wie funktioniert die Bedarfsprognose?</span>
+                </div>
+                <p>
+                  Das Prädiktionssystem kombiniert die monatlichen Umsatzvolumina des ersten Halbjahres 2026 mit den täglichen Entnahmen der Vision-KI (H.265-Verfolgung über CAM_02 und CAM_04).
+                </p>
+                <p>
+                  Unter Einbeziehung der <strong class="text-indigo-400">Hotel-Auslastung</strong> berechnet die mathematische Engine das tägliche Abgangstempo und projiziert den Zeitpunkt, an dem der Mindestbestand (Threshold) unterschritten wird.
+                </p>
+              </div>
+              <div class="space-y-2 font-mono text-zinc-500">
+                <div class="flex items-center gap-2">
+                  <mat-icon class="text-zinc-400 text-sm">calculate</mat-icon>
+                  <span class="font-bold text-zinc-300 uppercase tracking-wider text-[10px]">Verbrauchsalgorithmus & Formel</span>
+                </div>
+                <div class="bg-zinc-950 p-2.5 rounded border border-zinc-850/80 text-zinc-400 text-[10px]">
+                  Daily Velocity: v = v_base * (Occupancy / 75)<br/>
+                  Days to Threshold: d = (Stock - Threshold) / v<br/>
+                  Recommended Order Date: Date_today + d - Lead_Time (Supplier)
+                </div>
+                <p class="text-[9px] leading-normal font-sans">
+                  Sicherheitsbestände gewährleisten, dass neue Ware eintrifft, bevor die Regale gänzlich leer sind. Die Lieferzeiten (Lead Time) der Zulieferer reichen von 1 Tag (Frischwaren) bis zu 5 Tagen (Zutrittskarten).
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      }
+
+      <!-- ========================================== -->
+      <!-- TAB 4: COGNITIVE ASSISTANT (GEMINI) -->
+      <!-- ========================================== -->
+      @if (activeTab === 'assistant') {
+        <div class="space-y-8 animate-fade-in max-w-4xl mx-auto h-[550px] flex flex-col justify-between">
+          
+          <div class="bg-zinc-900/30 border border-zinc-800 rounded-2xl flex-1 flex flex-col h-full overflow-hidden">
+            
+            <!-- Chat Header -->
+            <div class="p-5 border-b border-zinc-800 bg-[#0C0C0E] flex justify-between items-center shrink-0">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
+                  <mat-icon class="text-indigo-400">psychology</mat-icon>
+                </div>
+                <div>
+                  <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider">Integrierter Vision-KI-Assistent</h3>
+                  <p class="text-[10px] text-zinc-500 mt-0.5">Antworten basierend auf YOLO/SAM2 Video-Logs</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 text-xs font-mono text-zinc-400 bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-850">
+                <span>Engine:</span>
+                <strong class="text-indigo-400 font-semibold">gemini-2.5-flash</strong>
+              </div>
+            </div>
+
+            <!-- Chat Message Scroll Pane -->
+            <div id="chat-scroll-pane" class="flex-1 overflow-y-auto p-6 space-y-4">
+              @for (msg of assistantMessages; track msg.text) {
+                <div class="flex" [ngClass]="msg.sender === 'user' ? 'justify-end' : 'justify-start'">
+                  <div class="max-w-[85%] rounded-2xl p-4 text-xs leading-relaxed font-sans shadow-md"
+                       [ngClass]="msg.sender === 'user' ? 
+                                  'bg-indigo-600 text-white rounded-tr-none' : 
+                                  'bg-zinc-900/40 border border-zinc-800 text-zinc-200 rounded-tl-none'">
+                    
+                    <div class="prose prose-invert max-w-none text-xs text-inherit break-words" [innerHTML]="formatMessageText(msg.text)"></div>
+                    
+                    <div class="text-[9px] text-zinc-500 text-right mt-2 font-mono">
+                      {{ msg.timestamp }}
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @if (assistantLoading) {
+                <div class="flex justify-start">
+                  <div class="bg-zinc-900/40 border border-zinc-800 rounded-2xl rounded-tl-none p-4 text-xs text-zinc-400 flex items-center gap-2">
+                    <span class="flex h-1.5 w-1.5 relative">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
+                    </span>
+                    <span>Regal- und Video-Log-Analyse läuft...</span>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Suggestions list -->
+            <div class="px-6 py-3 border-t border-zinc-850 bg-zinc-950/20 flex flex-wrap gap-2 shrink-0">
+              <span class="text-[10px] text-zinc-500 flex items-center gap-1 font-sans mr-2 py-1">Vorschläge:</span>
+              <button (click)="useSuggestion('Welche Produkte haben derzeit einen geringen Bestand?')" class="text-[11px] bg-zinc-900/50 hover:bg-zinc-800/50 border border-zinc-800 hover:border-zinc-700 text-zinc-300 px-3 py-1 rounded-full cursor-pointer transition-all">📈 Geringer Bestand</button>
+              <button (click)="useSuggestion('Welche Zutaten hat Küchenchef Carlos Mendoza heute entnommen?')" class="text-[11px] bg-zinc-900/50 hover:bg-slate-800/50 border border-zinc-800 hover:border-zinc-700 text-zinc-300 px-3 py-1 rounded-full cursor-pointer transition-all">🧑‍🍳 Küchenchef-Entnahmen</button>
+              <button (click)="useSuggestion('Wie hoch ist der Bestand an Coca-Cola und welche Bewegungen gab es?')" class="text-[11px] bg-zinc-900/50 hover:bg-slate-800/50 border border-zinc-800 hover:border-zinc-700 text-zinc-300 px-3 py-1 rounded-full cursor-pointer transition-all">🥤 Coca-Cola-Verlauf</button>
+              <button (click)="useSuggestion('Geben Sie mir eine vollständige Inventarzusammenfassung')" class="text-[11px] bg-zinc-900/50 hover:bg-slate-800/50 border border-zinc-800 hover:border-zinc-700 text-zinc-300 px-3 py-1 rounded-full cursor-pointer transition-all">📋 Vollständige Übersicht</button>
+            </div>
+
+            <!-- Input Bar -->
+            <div class="p-4 border-t border-zinc-800 bg-[#0C0C0E]/60 shrink-0">
+              <form (submit)="submitAssistantQuery()" class="flex items-center gap-3">
+                <input 
+                  type="text" 
+                  [value]="assistantQuery"
+                  (input)="onQueryInput($event)"
+                  placeholder="Schreiben Sie eine Frage zum Lager... (z. B. Wer hat heute Mehl entnommen?)"
+                  class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 transition-all placeholder:text-zinc-600 font-sans"
+                />
+                <button 
+                  type="submit" 
+                  [disabled]="!assistantQuery.trim() || assistantLoading"
+                  class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-3 sm:px-5 rounded-xl text-xs font-semibold cursor-pointer transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                >
+                  <mat-icon class="text-sm w-4 h-4">send</mat-icon>
+                  <span class="hidden sm:inline">Anfragen</span>
+                </button>
+              </form>
+            </div>
+
+          </div>
+
+        </div>
+      }
+
+      <!-- ========================================== -->
+      <!-- TAB 5: ARCHITECTURE AND PRODUCT BLUEPRINT -->
+      <!-- ========================================== -->
+      @if (activeTab === 'architecture') {
+        <div class="space-y-8 animate-fade-in max-w-5xl mx-auto">
+          
+          <!-- Architecture Overview Hero -->
+          <div class="bg-zinc-900/30 border border-zinc-800 p-8 rounded-2xl space-y-4">
+            <span class="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 text-[10px] font-mono tracking-wider font-bold">SOFTWARE SPECIFICATION</span>
+            <h3 class="text-xl font-bold text-zinc-100 tracking-wide">Multi-Tenant-SaaS-Plattform - Architektur des Hotel-Betriebssystems</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed max-w-3xl">
+              Hotel Hamburg ist nach dem Paradigma <strong>Inferenz am Edge + Zentralisierte Ereignisaufnahme</strong> konzipiert. Die vorhandenen Sicherheitskameras des Hotels werden über RTSP-Streams in lokale Mikroservices integriert, die Videos in Echtzeit verarbeiten. Die extrahierten Metadaten und die Objektverfolgung werden als zentralisierte logistische Ereignisse übertragen, wodurch die Privatsphäre der Gäste geschützt und eine weltweite Skalierbarkeit ohne übermäßige Cloud-Speicherkosten gewährleistet wird.
+            </p>
+          </div>
+
+          <!-- Tabbed architectural breakdowns -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6 space-y-4">
+              <div class="flex items-center gap-3">
+                <mat-icon class="text-indigo-400">memory</mat-icon>
+                <h4 class="text-xs font-bold text-zinc-200 uppercase tracking-wider">Künstliche Intelligenz Engine</h4>
+              </div>
+              <ul class="space-y-3.5 text-xs text-zinc-400 leading-relaxed font-sans">
+                <li>
+                  <strong class="text-zinc-300 font-medium block">YOLOv10 / YOLOv8:</strong> 
+                  Schnelle Edge-Erfassung von Personen, Kisten, Paletten und Sackkarren mit einer Latenz von &lt;15ms.
+                </li>
+                <li>
+                  <strong class="text-zinc-300 font-medium block">Segment Anything 2 (SAM2):</strong> 
+                  Präzise Segmentierung von Objekten zur Erfassung komplexer manueller Interaktionen (Entnahme, Lieferung, Umlagerung) in den Regalen.
+                </li>
+                <li>
+                  <strong class="text-zinc-300 font-medium block">ByteTrack / DeepSORT:</strong> 
+                  Lückenlose Verfolgung einzelner Produkte während ihres gesamten Lebenszyklus und Aufzeichnung von 2D-Bewegungspfaden.
+                </li>
+                <li>
+                  <strong class="text-zinc-300 font-medium block">Grounding DINO + Florence-2:</strong> 
+                  Zero-Shot-Klassifizierung und -Zählung von Produkten für eine dynamische Bestandsaufnahme von beschrifteten Kartons.
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6 space-y-4">
+              <div class="flex items-center gap-3">
+                <mat-icon class="text-indigo-400">cloud_queue</mat-icon>
+                <h4 class="text-xs font-bold text-zinc-200 uppercase tracking-wider">Ingestionsfluss & Datenbank</h4>
+              </div>
+              <ul class="space-y-3.5 text-xs text-zinc-400 leading-relaxed font-sans">
+                <li>
+                  <strong class="text-zinc-300 font-medium block">PostgreSQL (Relational):</strong> 
+                  Multi-Tenant-SaaS-Unterstützung mit Row-Level Security (RLS) zur Isolierung der Hotel- und Filialbetriebe.
+                </li>
+                <li>
+                  <strong class="text-zinc-300 font-medium block">Apache Kafka Messaging:</strong> 
+                  Asynchroner Hochleistungs-Nachrichtenbus, der die lokale Video-Inferenz vom zentralen Backend entkoppelt.
+                </li>
+                <li>
+                  <strong class="text-zinc-300 font-medium block">Redis Cache:</strong> 
+                  Echtzeit-Abbildung virtueller Regale und des aktiven Status von Mitarbeiter-Ausweisen in kritischen Bereichen.
+                </li>
+                <li>
+                  <strong class="text-zinc-300 font-medium block">Event Engine:</strong> 
+                  Verarbeitungs-Engine für räumliche Regeln, die Video-Interaktionen (z. B. Hand berührt Coca-Cola + Hand zieht sich zurück) in Bestandsänderungen übersetzt.
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6 space-y-4">
+              <div class="flex items-center gap-3">
+                <mat-icon class="text-indigo-400">security</mat-icon>
+                <h4 class="text-xs font-bold text-zinc-200 uppercase tracking-wider">Hochpräzise Rückverfolgbarkeit (&gt;98%)</h4>
+              </div>
+              <ul class="space-y-3.5 text-xs text-zinc-400 leading-relaxed font-sans">
+                <li>
+                  <strong class="text-zinc-300 font-medium block">Kreuzvalidierung über RFID / QR:</strong> 
+                  Fusion von Computer Vision mit physischen Scannern (RFID-Gates an Türen, QR-Codes auf Verpackungen) zur hochpräzisen Bestandsbestätigung.
+                </li>
+                <li>
+                  <strong class="text-zinc-300 font-medium block">Automatische Etiketten-OCR:</strong> 
+                  Echtzeit-OCR-Lesung von Lieferscheinen und Rechnungen bei der Warenannahme an der Laderampe.
+                </li>
+                <li>
+                  <strong class="text-zinc-300 font-medium block">Einvernehmliches biometrisches Audit:</strong> 
+                  Zutrittsprüfung durch autorisierte Gesichtserkennung oder mobilen Dienstausweis registrierter Mitarbeiter.
+                </li>
+              </ul>
+            </div>
+
+          </div>
+
+          <!-- Relational database schema breakdown (Enterprise grade) -->
+          <div class="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 space-y-4">
+            <div class="flex items-center gap-3">
+              <mat-icon class="text-indigo-400">dataset</mat-icon>
+              <h4 class="text-xs font-bold text-zinc-200 uppercase tracking-wider">Relationales Datenbankdesign (PostgreSQL Blueprint)</h4>
+            </div>
+            
+            <p class="text-xs text-zinc-500">
+              Global skalierbares Multi-Tenant-Datenbankschema, das die Rückverfolgbarkeit des Hotels aufzeichnet und jede Organisation strikt isoliert:
+            </p>
+
+            <pre class="bg-zinc-950 border border-zinc-800 rounded-xl p-5 overflow-x-auto text-[10px] text-zinc-400 font-mono leading-relaxed">
+-- Mandanten-Stammtabelle (Tenants)
+CREATE TABLE organizations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    plan_tier VARCHAR(50) DEFAULT 'Enterprise',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Filialen-Tabelle (Hotels)
+CREATE TABLE hotels (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    address TEXT,
+    timezone VARCHAR(100) NOT NULL
+);
+
+-- Lager-Tabelle (Zentrallager)
+CREATE TABLE warehouses (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    hotel_id UUID REFERENCES hotels(id) ON DELETE CASCADE,
+    name VARCHAR(100) NOT NULL
+);
+
+-- Artikel-Tabelle
+CREATE TABLE items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    warehouse_id UUID REFERENCES warehouses(id) ON DELETE CASCADE,
+    sku VARCHAR(100) UNIQUE NOT NULL,
+    barcode VARCHAR(100),
+    rfid_tag VARCHAR(100),
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    current_stock INT DEFAULT 0,
+    safety_threshold INT DEFAULT 5,
+    shelf_location VARCHAR(100) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Von der IP-Kamera-Engine registrierte Ereignisse
+CREATE TABLE events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+    hotel_id UUID REFERENCES hotels(id) ON DELETE CASCADE,
+    camera_id VARCHAR(100) NOT NULL,
+    timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    type VARCHAR(50) CHECK (type IN ('INGRESO', 'EGRESO', 'REUBICACION', 'SISTEMA', 'ALERTA')),
+    description TEXT NOT NULL,
+    operator_id VARCHAR(100),
+    tracking_uuid UUID
+);</pre>
+          </div>
+
+          <!-- Product Roadmap & Future modules -->
+          <div class="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 space-y-4">
+            <div class="flex items-center gap-3">
+              <mat-icon class="text-indigo-400">alt_route</mat-icon>
+              <h4 class="text-xs font-bold text-zinc-200 uppercase tracking-wider">Produkt-Roadmap & Zukünftige Module</h4>
+            </div>
+            
+            <p class="text-xs text-zinc-500 leading-relaxed">
+              Die Plattform wird dieselbe zugrunde liegende Computer-Vision-Infrastruktur nutzen, um schrittweise andere Abteilungen des Hotels zu automatisieren:
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs font-sans">
+              <div class="bg-zinc-950/40 border border-zinc-850 rounded-xl p-4">
+                <span class="text-[9px] text-indigo-400 font-mono font-bold block">PHASE 1 - LAGER</span>
+                <strong class="text-zinc-200 block mt-1.5 font-medium">Zutaten- & Bedarfsmanagement</strong>
+                <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">Ankunft von Lieferanten, Entnahmen durch Küchenchefs, Abfallkontrolle und automatische Nachbestellung.</p>
+              </div>
+
+              <div class="bg-zinc-950/40 border border-zinc-850 rounded-xl p-4">
+                <span class="text-[9px] text-zinc-500 font-mono font-bold block">PHASE 2 - HOUSEKEEPING</span>
+                <strong class="text-zinc-200 block mt-1.5 font-medium">Wäscherei & Zimmer</strong>
+                <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">Automatische Zählung von Bettwäsche und Handtüchern in Wagen, Erkennung von reinigungsbereiten Bereichen.</p>
+              </div>
+
+              <div class="bg-zinc-950/40 border border-zinc-850 rounded-xl p-4">
+                <span class="text-[9px] text-zinc-500 font-mono font-bold block">PHASE 3 - KÜCHE & REST.</span>
+                <strong class="text-zinc-200 block mt-1.5 font-medium">Qualitätskontrolle</strong>
+                <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">Automatische Abfallprüfung, Zählung servierter Teller und Hygienealarme per Video.</p>
+              </div>
+
+              <div class="bg-zinc-950/40 border border-zinc-850 rounded-xl p-4">
+                <span class="text-[9px] text-zinc-500 font-mono font-bold block">PHASE 4 - GEMEINSCHAFTSBEREICHE</span>
+                <strong class="text-zinc-200 block mt-1.5 font-medium">Auslastung & Sicherheit</strong>
+                <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">Überwachung der Auslastung von Fitnessstudios und Pools, Erkennung von Anomalien und präventive Sicherheitsalarme.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ========================================== -->
+      <!-- TAB 6: PDF REPORTS GENERATOR -->
+      <!-- ========================================== -->
+      @if (activeTab === 'reports') {
+        <div class="space-y-8 animate-fade-in max-w-5xl mx-auto pb-12">
+          
+          <!-- Header Banner -->
+          <div class="bg-[#0C0C0E] border border-zinc-800 p-8 rounded-2xl space-y-4 shadow-xl">
+            <span class="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 text-[10px] font-mono tracking-wider font-bold">EXPORT-MODUL</span>
+            <h3 class="text-xl font-bold text-zinc-100 tracking-wide">Autonomer PDF-Berichtscompiler</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed max-w-3xl">
+              Diese Komponente ermöglicht es, den Verlauf der täglichen von Überwachungskameras erfassten Ereignisse, kritische Mindestbestandswarnungen und biometrische Daten des Servicepersonals strukturiert und unveränderlich zusammenzustellen. Die PDF-Berichte werden lokal unter strengen betrieblichen Prüfungsstandards erstellt.
+            </p>
+          </div>
+
+          <!-- Two Column layout for configuration and dynamic preview -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Config Form Column -->
+            <div class="lg:col-span-5 space-y-6">
+              <div class="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 space-y-6">
+                <div class="flex items-center gap-3 pb-3 border-b border-zinc-800">
+                  <mat-icon class="text-indigo-400">tune</mat-icon>
+                  <div>
+                    <h4 class="text-xs font-bold text-zinc-200 uppercase tracking-wider">Berichtsparameter</h4>
+                    <p class="text-[10px] text-zinc-500 mt-0.5">Personalisieren Sie die Informationen, die in das PDF-Dokument eingefügt werden sollen</p>
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  <!-- Custom Title -->
+                  <div class="space-y-1.5">
+                    <label for="report-title-input" class="text-[10px] text-zinc-400 font-mono block">DOKUMENTENTITEL</label>
+                    <input 
+                      id="report-title-input"
+                      type="text" 
+                      [value]="reportTitle"
+                      (input)="reportTitle = $any($event.target).value"
+                      placeholder="z. B. Täglicher Betriebsbericht" 
+                      class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 placeholder:text-zinc-700 font-sans"
+                    />
+                  </div>
+
+                  <!-- Select Shift -->
+                  <div class="space-y-1.5">
+                    <label for="report-shift-select" class="text-[10px] text-zinc-400 font-mono block">SCHICHT FÜR PRÜFUNG</label>
+                    <select 
+                      id="report-shift-select"
+                      [value]="reportShift"
+                      (change)="reportShift = $any($event.target).value"
+                      class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 font-sans cursor-pointer"
+                    >
+                      <option value="Día Completo (24 hrs)">Ganzer Tag (24 Std.)</option>
+                      <option value="Turno Mañana (06:00 - 14:00)">Frühschicht (06:00 - 14:00)</option>
+                      <option value="Turno Tarde (14:00 - 22:00)">Spätschicht (14:00 - 22:00)</option>
+                      <option value="Turno Noche (22:00 - 06:00)">Nachtschicht (22:00 - 06:00)</option>
+                    </select>
+                  </div>
+
+                  <!-- Include toggles -->
+                  <div class="space-y-3 pt-2">
+                    <span class="text-[10px] text-zinc-500 font-mono block uppercase">ENTHALTENE ABSCHNITTE</span>
+                    
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                      <input 
+                        type="checkbox" 
+                        [checked]="includeStockSummary"
+                        (change)="includeStockSummary = $any($event.target).checked"
+                        class="accent-indigo-500 rounded bg-zinc-950 border-zinc-800"
+                      />
+                      <div class="text-xs">
+                        <span class="text-zinc-200 block group-hover:text-white transition-colors">Bestandsübersicht</span>
+                        <span class="text-[10px] text-zinc-500 block font-sans">Tabelle mit allen Lagerartikeln, Beständen und Regalen</span>
+                      </div>
+                    </label>
+
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                      <input 
+                        type="checkbox" 
+                        [checked]="includeLowStockAlerts"
+                        (change)="includeLowStockAlerts = $any($event.target).checked"
+                        class="accent-indigo-500 rounded bg-zinc-950 border-zinc-800"
+                      />
+                      <div class="text-xs">
+                        <span class="text-zinc-200 block group-hover:text-white transition-colors">Warnungen bei geringem Bestand</span>
+                        <span class="text-[10px] text-zinc-500 block font-sans">Hervorgehobene Box mit Artikeln unter dem Mindestbestand ({{ alertsCount }} Warnungen)</span>
+                      </div>
+                    </label>
+
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                      <input 
+                        type="checkbox" 
+                        [checked]="includeEventLogs"
+                        (change)="includeEventLogs = $any($event.target).checked"
+                        class="accent-indigo-500 rounded bg-zinc-950 border-zinc-800"
+                      />
+                      <div class="text-xs">
+                        <span class="text-zinc-200 block group-hover:text-white transition-colors">CCTV-Verlauf & Inferenzen</span>
+                        <span class="text-[10px] text-zinc-500 block font-sans">Liste aller logistischen Ereignisse, Eingänge und Entnahmen ({{ events.length }} Ereignisse)</span>
+                      </div>
+                    </label>
+
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                      <input 
+                        type="checkbox" 
+                        [checked]="includePersonnelLogs"
+                        (change)="includePersonnelLogs = $any($event.target).checked"
+                        class="accent-indigo-500 rounded bg-zinc-950 border-zinc-800"
+                      />
+                      <div class="text-xs">
+                        <span class="text-zinc-200 block group-hover:text-white transition-colors">Zutritte von registriertem Personal</span>
+                        <span class="text-[10px] text-zinc-500 block font-sans">Rückverfolgbarkeit der erfassten Mitarbeiter ({{ people.length }} Mitarbeiter)</span>
+                      </div>
+                    </label>
+                  </div>
+
+                  <!-- Comments / Observations text field -->
+                  <div class="space-y-1.5 pt-2">
+                    <label for="report-obs-textarea" class="text-[10px] text-zinc-400 font-mono block">NOTIZEN / ANMERKUNGEN DER LEITUNG</label>
+                    <textarea 
+                      id="report-obs-textarea"
+                      [value]="reportObservations"
+                      (input)="reportObservations = $any($event.target).value"
+                      rows="3"
+                      placeholder="Schreiben Sie Kommentare, die am Ende des Berichts eingefügt werden sollen (z. B. Die außerordentliche Entnahme von Mehl durch Carlos M. wurde genehmigt...)" 
+                      class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 placeholder:text-zinc-700 font-sans resize-none"
+                    ></textarea>
+                  </div>
+
+                  <!-- Generate Action Button -->
+                  <div class="pt-4">
+                    <button 
+                      (click)="exportPDF()"
+                      [disabled]="isGeneratingPDF"
+                      class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-xs font-semibold cursor-pointer transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      @if (isGeneratingPDF) {
+                        <span class="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></span>
+                        <span>Kompiliere PDF-Bericht...</span>
+                      } @else {
+                        <mat-icon class="text-sm">picture_as_pdf</mat-icon>
+                        <span>Operativen PDF-Bericht exportieren</span>
+                      }
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Interactive Live Preview Column -->
+            <div class="lg:col-span-7 space-y-6">
+              <div class="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                  <div class="flex items-center gap-3">
+                    <mat-icon class="text-indigo-400">visibility</mat-icon>
+                    <div>
+                      <h4 class="text-xs font-bold text-zinc-200 uppercase tracking-wider">Dynamisches Dokumentenschema</h4>
+                      <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Logische Struktur und Seitenverteilung des resultierenden PDFs</p>
+                    </div>
+                  </div>
+                  <span class="px-2 py-0.5 text-[9px] font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full tracking-wider uppercase">VORSCHAU</span>
+                </div>
+
+                <!-- PDF Layout visual container -->
+                <div class="bg-zinc-950 border border-zinc-850 rounded-xl p-4 sm:p-8 text-zinc-400 font-sans text-xs space-y-6 min-h-[500px] flex flex-col justify-between shadow-2xl relative overflow-hidden">
+                  
+                  <!-- Watermark overlay during generation -->
+                  @if (isGeneratingPDF) {
+                    <div class="absolute inset-0 bg-zinc-950/80 backdrop-blur-xs flex flex-col items-center justify-center space-y-3 z-10 animate-fade-in">
+                      <div class="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center">
+                        <span class="animate-spin w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full"></span>
+                      </div>
+                      <p class="text-sm text-zinc-200 font-semibold tracking-wide">Systemdaten werden kompiliert...</p>
+                      <p class="text-[10px] text-zinc-500 font-mono">Füge {{ events.length }} CCTV-Ereignisse in das PDF-Raster ein</p>
+                    </div>
+                  }
+
+                  <!-- Printable Page Draft layout mimic -->
+                  <div class="space-y-6">
+                    <!-- Fake Top line accent -->
+                    <div class="h-1 bg-indigo-500 w-full rounded-t"></div>
+
+                    <!-- Title Header -->
+                    <div class="flex justify-between items-start pb-4 border-b border-zinc-900">
+                      <div>
+                        <h5 class="text-sm font-bold text-white tracking-wide uppercase font-sans">{{ reportTitle || 'Täglicher Betriebsbericht' }}</h5>
+                        <p class="text-[10px] text-indigo-400 font-mono uppercase tracking-wider">KOGNITIVES SYSTEM - HOTEL HAMBURG</p>
+                      </div>
+                      <div class="text-right font-mono text-[9px] text-zinc-500">
+                        <p>DATUM: {{ getCurrentTime() }}</p>
+                        <p>SCHICHT: {{ reportShift }}</p>
+                      </div>
+                    </div>
+
+                    <!-- Section Content Draft visual blocks -->
+                    <div class="space-y-4">
+                      <!-- Page Summary Draft -->
+                      <div class="bg-zinc-900/40 border border-zinc-850 rounded-lg p-3.5 space-y-2">
+                        <span class="text-[9px] font-mono text-zinc-500 block tracking-wider font-bold">1. EXECUTIVE SUMMARY DER METRIKEN</span>
+                        <div class="grid grid-cols-4 gap-2 text-center">
+                          <div class="bg-zinc-950/60 p-2 rounded border border-zinc-900">
+                            <span class="text-[10px] font-semibold text-white block">{{ events.length }}</span>
+                            <span class="text-[8px] text-zinc-500 block uppercase font-mono">Log. Ereignisse</span>
+                          </div>
+                          <div class="bg-zinc-950/60 p-2 rounded border border-zinc-900">
+                            <span class="text-[10px] font-semibold text-white block">{{ inventory.length }}</span>
+                            <span class="text-[8px] text-zinc-500 block uppercase font-mono">Artikel</span>
+                          </div>
+                          <div class="bg-zinc-950/60 p-2 rounded border border-zinc-900">
+                            <span class="text-[10px] font-semibold text-red-400 block">{{ alertsCount }}</span>
+                            <span class="text-[8px] text-zinc-500 block uppercase font-mono">Kritisch</span>
+                          </div>
+                          <div class="bg-zinc-950/60 p-2 rounded border border-zinc-900">
+                            <span class="text-[10px] font-semibold text-white block">{{ people.length }}</span>
+                            <span class="text-[8px] text-zinc-500 block uppercase font-mono">Mitarbeiter</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Inventory Table Draft visual -->
+                      @if (includeStockSummary) {
+                        <div class="bg-zinc-900/40 border border-zinc-850 rounded-lg p-3.5 space-y-2">
+                          <span class="text-[9px] font-mono text-zinc-500 block tracking-wider font-bold">2. BESTANDSDETAILS IN REGALEN (VORSCHAU-MOCKUP)</span>
+                          <div class="space-y-1 font-mono text-[9px] text-zinc-500">
+                            <div class="flex justify-between font-semibold text-zinc-400 border-b border-zinc-900 pb-1">
+                              <span>ARTIKEL</span>
+                              <span>STANDORT</span>
+                              <span>BESTAND</span>
+                            </div>
+                            <div class="flex justify-between py-0.5">
+                              <span class="text-zinc-300">Weizenmehl Tipo 00 25kg</span>
+                              <span>Regal B-2</span>
+                              <span class="text-zinc-300">12 Säcke</span>
+                            </div>
+                            <div class="flex justify-between py-0.5">
+                              <span class="text-zinc-300">Coca-Cola Kisten 350ml</span>
+                              <span>Regal A-3</span>
+                              <span class="text-zinc-300">18 Kisten</span>
+                            </div>
+                            <div class="flex justify-between py-0.5 text-zinc-500 italic">
+                              <span>... und {{ inventory.length - 2 }} weitere Artikel</span>
+                              <span>...</span>
+                              <span>...</span>
+                            </div>
+                          </div>
+                        </div>
+                      }
+
+                      <!-- Low stock warning draft -->
+                      @if (includeLowStockAlerts && alertsCount > 0) {
+                        <div class="bg-amber-500/5 border border-amber-500/15 rounded-lg p-3 space-y-1">
+                          <span class="text-[9px] font-mono text-amber-500 block font-bold tracking-wider">⚠️ BESTANDSAUFFÜLLUNG ERFORDERLICH ({{ alertsCount }} WARNUNGEN)</span>
+                          <p class="text-[10px] text-zinc-500 leading-relaxed font-sans">
+                            Ein auffälliger gelber Warnbereich mit den Artikeln, die dringend aufgefüllt werden müssen, wird eingefügt, um die Einkaufsabteilung zu benachrichtigen.
+                          </p>
+                        </div>
+                      }
+
+                      <!-- CCTV logs draft -->
+                      @if (includeEventLogs) {
+                        <div class="bg-zinc-900/40 border border-zinc-850 rounded-lg p-3.5 space-y-2">
+                          <span class="text-[9px] font-mono text-zinc-500 block tracking-wider font-bold">3. VIDEOANALYSE-EREIGNISPROTOKOLL</span>
+                          <div class="space-y-1 text-[10px] text-zinc-500 leading-relaxed">
+                            <div class="flex items-center gap-2">
+                              <span class="text-[8px] bg-sky-500/10 text-sky-400 border border-sky-500/20 px-1 py-0.1 font-mono rounded">EINGANG</span>
+                              <span class="text-zinc-400">YOLO: Carlos Mendoza hat das Lager betreten</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                              <span class="text-[8px] bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1 py-0.1 font-mono rounded">AUSGANG</span>
+                              <span class="text-zinc-400">YOLO: Entnahme an Regal B-2 erkannt</span>
+                            </div>
+                            <div class="text-[9px] text-zinc-600 italic mt-1 font-mono">
+                              * {{ events.length }} Datensätze werden in chronologischer Reihenfolge mit Bediener- und Kameradetails exportiert.
+                            </div>
+                          </div>
+                        </div>
+                      }
+
+                      <!-- Credential/Personnel Logs draft -->
+                      @if (includePersonnelLogs) {
+                        <div class="bg-zinc-900/40 border border-zinc-850 rounded-lg p-3.5 space-y-1">
+                          <span class="text-[9px] font-mono text-zinc-500 block tracking-wider font-bold">4. PROTOKOLL DER AUTORISIERTEN MITARBEITER</span>
+                          <p class="text-[10px] text-zinc-500 leading-relaxed font-sans">
+                            Das Protokoll der aktiven Bediener, die über FaceID oder mobilen Ausweis im Zentrallager erfasst wurden, wird hinzugefügt.
+                          </p>
+                        </div>
+                      }
+
+                      <!-- Observations draft -->
+                      @if (reportObservations.trim()) {
+                        <div class="bg-zinc-900/20 border border-zinc-850 border-dashed rounded-lg p-3 space-y-1">
+                          <span class="text-[9px] font-mono text-zinc-500 block tracking-wider font-bold">5. ZUSÄTZLICHE ANMERKUNGEN DER LEITUNG</span>
+                          <p class="text-[10px] text-zinc-300 italic font-sans leading-relaxed">
+                            "{{ reportObservations }}"
+                          </p>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Signatures and footer mock -->
+                  <div class="pt-6 border-t border-zinc-900 flex flex-col sm:flex-row justify-between items-center sm:items-end gap-4 text-center">
+                    <div class="space-y-1 text-center font-mono text-[8px] text-zinc-600 w-full sm:w-auto">
+                      <div class="w-28 border-t border-zinc-800 mx-auto"></div>
+                      <p>Unterschrift Bediener</p>
+                    </div>
+                    <p class="text-[8px] text-zinc-600 font-mono">Hotel Hamburg Vision AI - Vertrauliches Audit-Dokument</p>
+                    <div class="space-y-1 text-center font-mono text-[8px] text-zinc-600 w-full sm:w-auto">
+                      <div class="w-28 border-t border-zinc-800 mx-auto"></div>
+                      <p>Digitale KI-Validierung</p>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      }
+
+      <!-- ========================================== -->
+      <!-- TAB 7: SYSTEM HEALTH (SALUD DEL SISTEMA) -->
+      <!-- ========================================== -->
+      @if (activeTab === 'system_health') {
+        <div class="space-y-8 animate-fade-in max-w-6xl mx-auto pb-12">
+          
+          <!-- Title Hero -->
+          <div class="bg-zinc-900/30 border border-zinc-800 p-8 rounded-2xl space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <span class="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 text-[10px] font-mono tracking-wider font-bold">SYSTEM-ÜBERWACHUNG</span>
+                <h3 class="text-xl font-bold text-zinc-100 tracking-wide mt-2">Systemdiagnose des Computer-Vision-Systems</h3>
+                <p class="text-xs text-zinc-400 leading-relaxed max-w-2xl mt-1">
+                  Echtzeit-Überwachung der Videoübertragungs-Infrastruktur (CCTV), der Latenz des Edge-KI-Inferenz-Clusters und des Datendurchsatzes im Hotel Hamburg.
+                </p>
+              </div>
+              <div class="flex items-center gap-3">
+                <button 
+                  (click)="simulateLatencySpike()"
+                  class="bg-amber-600/15 hover:bg-amber-600/25 border border-amber-500/30 text-amber-400 px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all flex items-center gap-2"
+                >
+                  <mat-icon class="text-sm">bolt</mat-icon>
+                  Latenz simulieren
+                </button>
+                <button 
+                  (click)="reconnectAllCameras()"
+                  class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all flex items-center gap-2"
+                >
+                  <mat-icon class="text-sm">sync</mat-icon>
+                  Alle wiederherstellen
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Overview Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Latency Card -->
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider font-mono">NETZWERKLATENZ</h4>
+                  <p class="text-[10px] text-zinc-500 font-sans">End-to-End-Antwortzeit</p>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold"
+                      [ngClass]="networkLatency < 100 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'">
+                  {{ networkLatency < 100 ? 'HERVORRAGEND' : 'LANGSAM' }}
+                </span>
+              </div>
+              <div class="my-6">
+                <div class="flex items-baseline gap-2">
+                  <span class="text-4xl font-bold tracking-tight text-white font-sans">{{ networkLatency }}</span>
+                  <span class="text-sm text-zinc-500 font-mono">ms</span>
+                </div>
+                <!-- Mini simulated chart sparkline bar -->
+                <div class="flex gap-1 h-8 mt-4 items-end">
+                  <div class="w-full bg-zinc-850 h-5 rounded-[2px] overflow-hidden relative">
+                    <div class="absolute bottom-0 left-0 w-full bg-indigo-500/40 transition-all duration-500" [style.height.%]="networkLatency > 150 ? 95 : 42"></div>
+                  </div>
+                  <div class="w-full bg-zinc-850 h-7 rounded-[2px] overflow-hidden relative font-bold">
+                    <div class="absolute bottom-0 left-0 w-full bg-indigo-500/40 transition-all duration-500" [style.height.%]="networkLatency > 150 ? 88 : 35"></div>
+                  </div>
+                  <div class="w-full bg-zinc-850 h-6 rounded-[2px] overflow-hidden relative font-bold">
+                    <div class="absolute bottom-0 left-0 w-full bg-indigo-500/40 transition-all duration-500" [style.height.%]="networkLatency > 150 ? 91 : 48"></div>
+                  </div>
+                  <div class="w-full bg-zinc-850 h-8 rounded-[2px] overflow-hidden relative font-bold">
+                    <div class="absolute bottom-0 left-0 w-full transition-all duration-300"
+                         [ngClass]="networkLatency > 150 ? 'bg-rose-500/70' : 'bg-indigo-500'" 
+                         [style.height.%]="(networkLatency / 300) * 100"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="text-[10px] text-zinc-500 font-mono border-t border-zinc-850/60 pt-3 flex justify-between">
+                <span>Paketverlust:</span>
+                <span [class.text-rose-400]="packetLoss > 0" class="text-zinc-400 font-bold">{{ packetLoss | number:'1.1-2' }} %</span>
+              </div>
+            </div>
+
+            <!-- Cluster Availability Card -->
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider font-mono">KI-CLUSTER-VERFÜGBARKEIT</h4>
+                  <p class="text-[10px] text-zinc-500 font-sans">Edge- und Cloud-Verarbeitungsknoten</p>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold"
+                      [ngClass]="clusterStatus === 'OPTIMAL' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'">
+                  {{ clusterStatus }}
+                </span>
+              </div>
+              <div class="my-6">
+                <div class="flex items-baseline gap-2">
+                  <span class="text-4xl font-bold tracking-tight text-white font-sans">{{ clusterAvailability }}</span>
+                  <span class="text-sm text-zinc-500 font-mono">%</span>
+                </div>
+                <!-- Nodes status indicator lights -->
+                <div class="flex items-center gap-3 mt-4 bg-zinc-950/40 border border-zinc-850/60 p-2 rounded-xl">
+                  @for (node of clusterNodes; track node.name) {
+                    <div class="flex items-center gap-1.5 flex-1 justify-center py-1">
+                      <span class="w-2 h-2 rounded-full animate-pulse"
+                            [ngClass]="clusterStatus === 'OPTIMAL' ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                      <span class="text-[9px] text-zinc-400 font-mono truncate max-w-[65px]">{{ node.name.split(' ')[0] }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="text-[10px] text-zinc-500 font-mono border-t border-zinc-850/60 pt-3 flex justify-between">
+                <span>Globale Leistung:</span>
+                <span class="text-indigo-400 font-bold">148 FPS (3 stabile Knoten)</span>
+              </div>
+            </div>
+
+            <!-- Cameras Stats Card -->
+            <div class="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider font-mono">OPERATIVE KAMERAS</h4>
+                  <p class="text-[10px] text-zinc-500 font-sans">Live-Video-Kanäle (RTSP)</p>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold"
+                      [ngClass]="getOnlineCamerasCount() === 5 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'">
+                  {{ getOnlineCamerasCount() }}/5 ONLINE
+                </span>
+              </div>
+              <div class="my-6">
+                <div class="flex items-baseline gap-2">
+                  <span class="text-4xl font-bold tracking-tight text-white font-sans">{{ getOnlineCamerasCount() }}</span>
+                  <span class="text-sm text-zinc-500 font-sans">/ 5 hochauflösend (HD)</span>
+                </div>
+                <!-- Horizontal bar visualization -->
+                <div class="h-2 w-full bg-zinc-950 rounded-full overflow-hidden mt-6 flex gap-0.5">
+                  @for (cam of camerasHealth; track cam.id) {
+                    <div class="h-full flex-1 transition-all duration-300"
+                         [ngClass]="cam.status === 'ONLINE' ? 'bg-emerald-500' : 'bg-rose-500/30'"></div>
+                  }
+                </div>
+              </div>
+              <div class="text-[10px] text-zinc-500 font-mono border-t border-zinc-850/60 pt-3 flex justify-between">
+                <span>CCTV-Bandbreite:</span>
+                <span class="text-zinc-400 font-bold">~22.2 Mbps</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Section: 5 Cameras Details Grid -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="text-xs font-semibold text-zinc-300 uppercase tracking-wider font-mono">Integrität der CCTV IP-Kanäle (5 von 5)</h4>
+                <p class="text-[10px] text-zinc-500 font-sans">Einzelne Steuerungen, Hardware-Kodierungslatenz und Frame-Verlust</p>
+              </div>
+              <span class="text-[10px] text-zinc-400 bg-zinc-950 px-2.5 py-1 rounded-lg border border-zinc-850 font-mono">Streaming-Format: H.265 / RTSP</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+              @for (cam of camerasHealth; track cam.id) {
+                <div class="bg-zinc-900/20 border rounded-2xl p-5 flex flex-col justify-between transition-all hover:bg-zinc-900/30"
+                     [ngClass]="cam.status === 'ONLINE' ? 'border-zinc-800' : 'border-rose-950/40 bg-rose-950/5'">
+                  
+                  <div class="space-y-3">
+                    <!-- Status Header -->
+                    <div class="flex justify-between items-start">
+                      <div class="w-8 h-8 rounded-lg flex items-center justify-center border"
+                           [ngClass]="cam.status === 'ONLINE' ? 'bg-indigo-600/10 border-indigo-500/20 text-indigo-400' : 'bg-rose-950/20 border-rose-900/30 text-rose-400'">
+                        <mat-icon class="text-base">{{ cam.status === 'ONLINE' ? 'videocam' : 'videocam_off' }}</mat-icon>
+                      </div>
+                      <span class="text-[8px] px-1.5 py-0.5 rounded font-mono font-bold border tracking-wider"
+                            [ngClass]="cam.status === 'ONLINE' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'">
+                        {{ cam.status }}
+                      </span>
+                    </div>
+
+                    <!-- Details -->
+                    <div>
+                      <h5 class="text-xs font-semibold text-zinc-200 truncate" [title]="cam.name">{{ cam.name.split(':')[1] || cam.name }}</h5>
+                      <p class="text-[9px] text-zinc-500 font-mono mt-0.5 uppercase">{{ cam.location }}</p>
+                    </div>
+
+                    <!-- Metrics -->
+                    <div class="space-y-1.5 border-t border-zinc-850 pt-2.5 font-mono text-[10px]">
+                      <div class="flex justify-between text-zinc-400">
+                        <span class="text-zinc-500">Auflösung:</span>
+                        <span>{{ cam.resolution }}</span>
+                      </div>
+                      <div class="flex justify-between text-zinc-400">
+                        <span class="text-zinc-500">Bildrate:</span>
+                        <span>{{ cam.status === 'ONLINE' ? cam.fps + ' fps' : '0 fps' }}</span>
+                      </div>
+                      <div class="flex justify-between text-zinc-400">
+                        <span class="text-zinc-500">Latenz:</span>
+                        <span [ngClass]="cam.latency > 100 ? 'text-rose-400' : 'text-indigo-400'">{{ cam.latency }} ms</span>
+                      </div>
+                      <div class="flex justify-between text-zinc-400">
+                        <span class="text-zinc-500">Paketverlust:</span>
+                        <span>{{ cam.packetLoss }}%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Control Toggle Button -->
+                  <div class="pt-4 border-t border-zinc-850 mt-4">
+                    <button 
+                      (click)="toggleCameraStatus(cam.id)"
+                      class="w-full py-1.5 rounded-lg text-[9px] font-mono font-bold tracking-wider cursor-pointer border transition-all text-center"
+                      [ngClass]="cam.status === 'ONLINE' ? 
+                                 'bg-zinc-950 border-zinc-850 hover:bg-zinc-900 text-zinc-400 hover:text-white' : 
+                                 'bg-emerald-600 border-emerald-500 hover:bg-emerald-500 text-white'">
+                      {{ cam.status === 'ONLINE' ? 'TRENNUNG SIMULIEREN' : 'KAMERA VERBINDEN' }}
+                    </button>
+                  </div>
+
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Section: AI Infiltration & Processing Nodes -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+            
+            <!-- Nodes Telemetry -->
+            <div class="md:col-span-7 bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 space-y-4">
+              <div class="flex items-center gap-3 border-b border-zinc-800 pb-3">
+                <mat-icon class="text-indigo-400">memory</mat-icon>
+                <div>
+                  <h4 class="text-xs font-bold text-zinc-200 uppercase tracking-wider">Edge-Inferenz Hardware-Telemetrie</h4>
+                  <p class="text-[10px] text-zinc-500 font-sans">Lokale, verteilte GPU-Verarbeitungsknoten für geringe Latenz</p>
+                </div>
+              </div>
+
+              <div class="space-y-3.5">
+                @for (node of clusterNodes; track node.name) {
+                  <div class="bg-zinc-950/40 border border-zinc-850 p-4 rounded-xl space-y-3">
+                    <div class="flex justify-between items-center text-xs font-mono">
+                      <span class="font-bold text-zinc-300">{{ node.name }}</span>
+                      <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-900/30 font-bold">OPERATIV</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 text-[10px] font-mono text-zinc-500">
+                      <!-- CPU/GPU Load -->
+                      <div>
+                        <div class="flex justify-between mb-1">
+                          <span>GPU-Auslastung</span>
+                          <span class="text-zinc-300 font-bold">{{ node.load }}%</span>
+                        </div>
+                        <div class="h-1 bg-zinc-900 rounded-full overflow-hidden">
+                          <div class="h-full bg-indigo-500 transition-all duration-300" [style.width.%]="node.load"></div>
+                        </div>
+                      </div>
+
+                      <!-- Temp -->
+                      <div>
+                        <div class="flex justify-between mb-1">
+                          <span>Temperatur</span>
+                          <span [ngClass]="node.temp > 70 ? 'text-amber-400 font-bold' : 'text-zinc-300 font-bold'">{{ node.temp }}°C</span>
+                        </div>
+                        <div class="h-1 bg-zinc-900 rounded-full overflow-hidden">
+                          <div class="h-full transition-all duration-300" 
+                               [ngClass]="node.temp > 70 ? 'bg-amber-500' : 'bg-emerald-500'" 
+                               [style.width.%]="(node.temp / 100) * 100"></div>
+                        </div>
+                      </div>
+
+                      <!-- RAM & Net -->
+                      <div class="flex flex-col justify-end text-right">
+                        <span class="text-[9px] text-zinc-500 font-bold">RAM: {{ node.ram }}</span>
+                        <span class="text-[9px] text-zinc-500 font-bold">NETZ: {{ node.throughput }}</span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Pipeline Visual Explanation -->
+            <div class="md:col-span-5 bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between">
+              <div class="space-y-4">
+                <div class="flex items-center gap-3 border-b border-zinc-800 pb-3">
+                  <mat-icon class="text-indigo-400">psychology</mat-icon>
+                  <div>
+                    <h4 class="text-xs font-bold text-zinc-200 uppercase tracking-wider">Neuronaler Segmentierungs-Workflow</h4>
+                    <p class="text-[10px] text-zinc-500 font-sans">Autonome Ereigniskompilierung</p>
+                  </div>
+                </div>
+
+                <div class="space-y-4 text-xs text-zinc-400 leading-relaxed font-sans">
+                  <p>
+                    Das System verwendet den <strong class="text-indigo-400">H.265 (HEVC)</strong>-Codec, um die CCTV-Streams ohne Überlastung des internen Hotelnetzwerks zu empfangen.
+                  </p>
+                  <p>
+                    Jeder Edge-Knoten führt neuronale Faltungsnetzwerke parallel aus:
+                  </p>
+                  <ul class="list-disc list-inside space-y-1.5 pl-1.5 text-zinc-500 text-[11px] font-mono">
+                    <li><strong class="text-zinc-300 font-bold">YOLOv10:</strong> Schnelle Bounding-Box-Segmentierung und Erkennung mehrerer Klassen.</li>
+                    <li><strong class="text-zinc-300 font-bold">SAM 2:</strong> Präzise Pixel-Masken-Segmentierung für Waren.</li>
+                    <li><strong class="text-zinc-300 font-bold">ByteTrack:</strong> Zeitliche ID-Verknüpfung zur Vorhersage von Bewegungsbahnen.</li>
+                  </ul>
+                  <p>
+                    Falls eine Kamera ausfällt oder die Latenz den kritischen Schwellenwert überschreitet, leiten die Load-Balancer die Inferenz automatisch an den sekundären Cluster um, um eine Verfügbarkeit von 99,98 % zu gewährleisten.
+                  </p>
+                </div>
+              </div>
+
+              <div class="p-3 bg-zinc-950/40 border border-zinc-850 rounded-xl mt-4 flex items-center gap-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                <div class="text-[9px] font-mono text-zinc-500 leading-normal">
+                  Die Kommunikation mit dem Hauptserver erfolgt über <strong class="text-emerald-400 font-bold font-mono">gRPC</strong> über HTTPS, was einen minimalen Bandbreitenverbrauch garantiert.
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      }
+
+    </div>
+
+  </main>
+
+</div>

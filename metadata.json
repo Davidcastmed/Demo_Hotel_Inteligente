@@ -1,0 +1,6 @@
+{
+  "name": "Hotel Vision AI",
+  "description": "Intelligente Automatisierungsplattform für Hotels. Wandelt Videostreams von IP-Kameras in betriebliche Ereignisse um und automatisiert die Bestandsverwaltung, die Rückverfolgbarkeit von Vermögenswerten und die betriebliche Analyse.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
