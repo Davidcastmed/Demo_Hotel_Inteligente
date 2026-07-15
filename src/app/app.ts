@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject, ChangeDe
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { jsPDF } from 'jspdf';
+import { Database } from './database';
 
 interface InventoryItem {
   id: string;
@@ -103,6 +104,7 @@ interface ReactRoot {
 export class App implements OnInit, AfterViewInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
+  private db = inject(Database);
 
   @ViewChild('chartContainer', { static: false }) chartContainer!: ElementRef;
   private reactRoot?: ReactRoot;
@@ -992,52 +994,31 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   }
 
   fetchData() {
-    Promise.all([
-      fetch('/api/inventory').then(res => res.json()),
-      fetch('/api/events').then(res => res.json()),
-      fetch('/api/people').then(res => res.json()),
-      fetch('/api/monthly-movements').then(res => res.json()),
-      fetch('/api/inventory/alerts/preferences').then(res => res.json()).catch(() => null),
-      fetch('/api/inventory/alerts/history').then(res => res.json()).catch(() => [])
-    ]).then(([invData, evtsData, peopleData, movementsData, alertPrefData, alertHistData]) => {
-      this.inventory = invData;
-      this.events = evtsData;
-      this.people = peopleData;
-      this.monthlyMovements = movementsData;
-      if (alertPrefData) {
-        this.alertPreferences = alertPrefData;
-      }
-      if (alertHistData) {
-        this.notificationHistory = alertHistData;
-      }
-      
-      // Calculate low stock alert count
-      this.alertsCount = this.inventory.filter(item => item.stock <= item.threshold).length;
-      
-      // Fetch historical usage predictions
-      this.fetchPredictions();
-      this.cdr.markForCheck();
-      setTimeout(() => this.renderChart(), 100);
-    }).catch(err => {
-      console.error('Error fetching dashboard data:', err);
-    });
+    this.inventory = this.db.getInventory();
+    this.events = this.db.getEvents();
+    this.people = this.db.getPeople();
+    this.monthlyMovements = this.db.getMonthlyMovements();
+    this.alertPreferences = this.db.getAlertPreferences();
+    this.notificationHistory = this.db.getNotificationHistory();
+    this.alertsCount = this.inventory.filter(item => item.stock <= item.threshold).length;
+    this.fetchPredictions();
+    this.cdr.markForCheck();
+    setTimeout(() => this.renderChart(), 100);
   }
 
   fetchPredictions() {
     this.predictionLoading = true;
     this.cdr.markForCheck();
-    fetch(`/api/inventory/predictions?occupancy=${this.occupancyRate}`)
-      .then(res => res.json())
-      .then(data => {
-        this.predictions = data.predictions;
-        this.predictionLoading = false;
-        this.cdr.markForCheck();
-      })
-      .catch(err => {
-        console.error('Error fetching inventory predictions:', err);
-        this.predictionLoading = false;
-        this.cdr.markForCheck();
-      });
+    try {
+      const data = this.db.getPredictions(this.occupancyRate);
+      this.predictions = data.predictions;
+      this.predictionLoading = false;
+      this.cdr.markForCheck();
+    } catch (err) {
+      console.error('Error fetching inventory predictions:', err);
+      this.predictionLoading = false;
+      this.cdr.markForCheck();
+    }
   }
 
   updateOccupancyRate(rate: number) {
@@ -1046,22 +1027,8 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   }
 
   orderItem(itemId: string, quantity: number) {
-    fetch('/api/inventory/order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ itemId, quantity })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        // Refresh everything
-        this.inventory = data.inventory;
-        this.events = data.events;
-        this.alertsCount = this.inventory.filter(item => item.stock <= item.threshold).length;
-        this.fetchPredictions();
-      }
-    })
-    .catch(err => console.error('Error ordering item:', err));
+    this.db.orderItem(itemId, quantity);
+    this.fetchData();
   }
 
   // Switch camera feed and update corresponding YOLO bounding boxes
@@ -1174,34 +1141,18 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
         this.cdr.markForCheck();
       } else {
         clearInterval(interval);
-        
-        // Post the action to the backend to commit database changes
-        fetch('/api/simulate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action })
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            this.inventory = data.inventory;
-            this.events = data.events;
-            this.people = data.people;
-            this.monthlyMovements = data.monthlyMovements;
-            this.alertsCount = this.inventory.filter(item => item.stock <= item.threshold).length;
-            this.fetchPredictions();
-            setTimeout(() => this.renderChart(), 100);
-          }
+        try {
+          this.db.simulateAction(action);
+          this.fetchData();
           this.isSimulating = false;
           this.activeSimulationType = null;
           this.cdr.markForCheck();
-        })
-        .catch(err => {
-          console.error('Error running simulated backend action:', err);
+        } catch (err) {
+          console.error('Error running simulated action:', err);
           this.isSimulating = false;
           this.activeSimulationType = null;
           this.cdr.markForCheck();
-        });
+        }
       }
     }, 350);
   }
@@ -1326,35 +1277,18 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       // Add to beginning of local detection history log
       this.detectedItemsLog = [this.lastDetectedItem, ...this.detectedItemsLog].slice(0, 15);
 
-      // 6. Post stock change to server for persistent full-stack consistency!
-      fetch('/api/simulate-item-change', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          itemId: selectedEvent.itemId,
-          change: selectedEvent.change,
-          camera: currentCam === 'entrada' ? 'CAM_01_HAUPTEINGANG' :
-                  currentCam === 'cocina' ? 'CAM_02_HAUPTKUECHE' :
-                  currentCam === 'lavanderia' ? 'CAM_03_WAESCHEREI' :
-                  currentCam === 'bodega' ? 'CAM_04_ZENTRALLAGER' : 'CAM_05_LADERAMPE'
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          this.inventory = data.inventory;
-          this.events = data.events;
-          this.people = data.people;
-          this.monthlyMovements = data.monthlyMovements;
-          this.alertsCount = this.inventory.filter(item => item.stock <= item.threshold).length;
-          this.fetchPredictions();
-          setTimeout(() => this.renderChart(), 50);
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(err => {
-        console.error('Error posting auto scan item change:', err);
-      });
+      // 6. Update stock change via local Database service
+      try {
+        const targetCam = currentCam === 'entrada' ? 'CAM_01_HAUPTEINGANG' :
+                          currentCam === 'cocina' ? 'CAM_02_HAUPTKUECHE' :
+                          currentCam === 'lavanderia' ? 'CAM_03_WAESCHEREI' :
+                          currentCam === 'bodega' ? 'CAM_04_ZENTRALLAGER' : 'CAM_05_LADERAMPE';
+        this.db.simulateItemChange(selectedEvent.itemId, selectedEvent.change, targetCam);
+        this.fetchData();
+        setTimeout(() => this.renderChart(), 50);
+      } catch (err) {
+        console.error('Error simulating item change in local database:', err);
+      }
 
       this.cdr.markForCheck();
     }, 2500);
