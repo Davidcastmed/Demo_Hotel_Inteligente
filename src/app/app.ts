@@ -390,6 +390,10 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
   // API State
   inventory: InventoryItem[] = [];
+  selectedItemIds: Set<string> = new Set<string>();
+  bulkCategory = '';
+  bulkLocation = '';
+  bulkThreshold: number | null = null;
   events: EventLog[] = [];
   people: Person[] = [];
   monthlyMovements: MonthlyMovement[] = [];
@@ -1053,6 +1057,80 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   orderItem(itemId: string, quantity: number) {
     this.db.orderItem(itemId, quantity);
     this.fetchData();
+  }
+
+  // Multi-select methods
+  toggleSelectItem(itemId: string) {
+    if (this.selectedItemIds.has(itemId)) {
+      this.selectedItemIds.delete(itemId);
+    } else {
+      this.selectedItemIds.add(itemId);
+    }
+    this.cdr.markForCheck();
+  }
+
+  isItemSelected(itemId: string): boolean {
+    return this.selectedItemIds.has(itemId);
+  }
+
+  toggleSelectAllItems() {
+    if (this.selectedItemIds.size === this.inventory.length) {
+      this.selectedItemIds.clear();
+    } else {
+      this.inventory.forEach(item => this.selectedItemIds.add(item.id));
+    }
+    this.cdr.markForCheck();
+  }
+
+  isAllItemsSelected(): boolean {
+    return this.inventory.length > 0 && this.selectedItemIds.size === this.inventory.length;
+  }
+
+  applyBulkUpdates() {
+    if (this.selectedItemIds.size === 0) return;
+    
+    const updates: { category?: string; location?: string; threshold?: number } = {};
+    if (this.bulkCategory) {
+      updates.category = this.bulkCategory;
+    }
+    if (this.bulkLocation.trim()) {
+      updates.location = this.bulkLocation.trim();
+    }
+    if (this.bulkThreshold !== null && this.bulkThreshold !== undefined && this.bulkThreshold >= 0) {
+      updates.threshold = this.bulkThreshold;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return;
+    }
+
+    const ids = Array.from(this.selectedItemIds);
+    this.db.bulkUpdateItems(ids, updates);
+    this.fetchData();
+    
+    // Reset bulk form
+    this.bulkCategory = '';
+    this.bulkLocation = '';
+    this.bulkThreshold = null;
+    this.selectedItemIds.clear();
+    this.cdr.markForCheck();
+  }
+
+  clearBulkSelection() {
+    this.selectedItemIds.clear();
+    this.bulkCategory = '';
+    this.bulkLocation = '';
+    this.bulkThreshold = null;
+    this.cdr.markForCheck();
+  }
+
+  updateBulkThreshold(val: string) {
+    if (val === '' || val === null || val === undefined) {
+      this.bulkThreshold = null;
+    } else {
+      this.bulkThreshold = Number(val);
+    }
+    this.cdr.markForCheck();
   }
 
   // Switch camera feed and update corresponding YOLO bounding boxes

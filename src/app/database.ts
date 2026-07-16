@@ -288,6 +288,46 @@ export class Database {
     }
   }
 
+  public bulkUpdateItems(itemIds: string[], updates: { category?: string; location?: string; threshold?: number }) {
+    const prevInventory = JSON.parse(JSON.stringify(this.inventory));
+    let changed = false;
+
+    this.inventory.forEach(item => {
+      if (itemIds.includes(item.id)) {
+        if (updates.category !== undefined) {
+          item.category = updates.category;
+          changed = true;
+        }
+        if (updates.location !== undefined) {
+          item.location = updates.location;
+          changed = true;
+        }
+        if (updates.threshold !== undefined) {
+          item.threshold = updates.threshold >= 0 ? updates.threshold : 0;
+          changed = true;
+        }
+      }
+    });
+
+    if (changed) {
+      const now = new Date();
+      const timestamp = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+      this.events.unshift({
+        id: `evt-${Date.now()}-bulk-update`,
+        timestamp,
+        camera: 'Zentrallager',
+        type: 'SISTEMA',
+        description: `🔄 Mehrfachauswahl: ${itemIds.length} Artikel wurden aktualisiert (Kategorie/Lagerort/Schwellenwert).`,
+        items: `${itemIds.length} Artikel`,
+        operator: 'System-Administrator'
+      });
+      if (this.events.length > 100) {
+        this.events = this.events.slice(0, 100);
+      }
+      this.checkAndGenerateStockAlerts(prevInventory);
+    }
+  }
+
   public updateAlertPreferences(prefs: Partial<AlertPreference>) {
     this.alertPreferences = {
       emailEnabled: prefs.emailEnabled !== undefined ? !!prefs.emailEnabled : this.alertPreferences.emailEnabled,

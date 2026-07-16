@@ -1623,11 +1623,93 @@
                 </div>
               </div>
 
+              <!-- Bulk Action Panel -->
+              @if (selectedItemIds.size > 0) {
+                <div class="mb-5 p-4 bg-indigo-500/5 border border-indigo-500/20 rounded-xl space-y-3 animate-fade-in text-zinc-300">
+                  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                      <h4 class="text-xs font-bold text-indigo-400 flex items-center gap-1.5 uppercase tracking-wider">
+                        <mat-icon class="text-sm w-4 h-4">edit_note</mat-icon>
+                        Mehrfachauswahl-Aktionen
+                      </h4>
+                      <p class="text-[10px] text-zinc-500 mt-0.5">
+                        Sie haben <strong>{{ selectedItemIds.size }}</strong> {{ selectedItemIds.size === 1 ? 'Artikel' : 'Artikel' }} ausgewählt. Wählen Sie die zu aktualisierenden Felder:
+                      </p>
+                    </div>
+                    <button (click)="clearBulkSelection()" class="text-[10px] px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 cursor-pointer transition-colors border-none bg-transparent">
+                      Auswahl aufheben
+                    </button>
+                  </div>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                    <!-- Category selection -->
+                    <div class="space-y-1">
+                      <span class="text-[10px] font-semibold text-zinc-400 block font-mono">NEUE KATEGORIE</span>
+                      <select 
+                        #catSelect
+                        [value]="bulkCategory"
+                        (change)="bulkCategory = catSelect.value"
+                        class="w-full bg-zinc-950/60 border border-zinc-800 rounded px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500 transition-colors"
+                      >
+                        <option value="">- Unverändert -</option>
+                        @for (cat of categories; track cat) {
+                          @if (cat !== 'Alle') {
+                            <option [value]="cat">{{ cat }}</option>
+                          }
+                        }
+                      </select>
+                    </div>
+
+                    <!-- Location selection -->
+                    <div class="space-y-1">
+                      <span class="text-[10px] font-semibold text-zinc-400 block font-mono">NEUER LAGERORT</span>
+                      <input 
+                        type="text" 
+                        #locInput
+                        [value]="bulkLocation"
+                        (input)="bulkLocation = locInput.value"
+                        placeholder="- Unverändert - (z.B. Regal B-3)"
+                        class="w-full bg-zinc-950/60 border border-zinc-800 rounded px-2 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                      >
+                    </div>
+
+                    <!-- Threshold selection -->
+                    <div class="space-y-1">
+                      <span class="text-[10px] font-semibold text-zinc-400 block font-mono">NEUER SCHWELLENWERT (MIN)</span>
+                      <input 
+                        type="number" 
+                        #threshInput
+                        [value]="bulkThreshold === null ? '' : bulkThreshold"
+                        (input)="updateBulkThreshold(threshInput.value)"
+                        placeholder="- Unverändert -"
+                        class="w-full bg-zinc-950/60 border border-zinc-800 rounded px-2 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                      >
+                    </div>
+                  </div>
+
+                  <div class="flex justify-end gap-2 pt-2 border-t border-indigo-500/10">
+                    <button 
+                      (click)="applyBulkUpdates()"
+                      [disabled]="!bulkCategory && !bulkLocation.trim() && (bulkThreshold === null || bulkThreshold === undefined)"
+                      class="text-xs px-4 py-1.5 rounded font-medium bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white cursor-pointer transition-all flex items-center gap-1 border-none"
+                    >
+                      <mat-icon class="text-xs w-4 h-4">save</mat-icon>
+                      Auswahl aktualisieren
+                    </button>
+                  </div>
+                </div>
+              }
+
               <!-- Inventory Table container -->
               <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs text-zinc-300 border border-zinc-850 rounded-lg overflow-hidden">
                   <thead>
                      <tr class="bg-zinc-950/80 text-zinc-400 font-mono tracking-wider border-b border-zinc-800">
+                      <th class="px-2 sm:px-4 py-3 text-center w-10">
+                        <label class="inline-flex items-center justify-center cursor-pointer p-1 rounded hover:bg-zinc-800 transition-colors">
+                          <input type="checkbox" [checked]="isAllItemsSelected()" (change)="toggleSelectAllItems()" class="w-4 h-4 rounded bg-zinc-950 border-zinc-800 text-indigo-500 focus:ring-indigo-500 accent-indigo-500">
+                        </label>
+                      </th>
                       <th class="px-2 sm:px-4 py-3">ID</th>
                       <th class="px-2 sm:px-4 py-3">Artikel</th>
                       <th class="px-2 sm:px-4 py-3 hidden sm:table-cell">Kategorie</th>
@@ -1639,7 +1721,12 @@
                   </thead>
                   <tbody>
                      @for (item of inventory; track item.id) {
-                      <tr class="border-b border-zinc-850 hover:bg-zinc-800/20 transition-colors">
+                      <tr class="border-b border-zinc-850 hover:bg-zinc-800/20 transition-colors" [class.bg-indigo-500/5]="isItemSelected(item.id)">
+                        <td class="px-2 sm:px-4 py-3.5 text-center w-10">
+                          <label class="inline-flex items-center justify-center cursor-pointer p-1 rounded hover:bg-zinc-800/50 transition-colors">
+                            <input type="checkbox" [checked]="isItemSelected(item.id)" (change)="toggleSelectItem(item.id)" class="w-4 h-4 rounded bg-zinc-950 border-zinc-800 text-indigo-500 focus:ring-indigo-500 accent-indigo-500">
+                          </label>
+                        </td>
                         <td class="px-2 sm:px-4 py-3.5 font-mono text-[11px] text-zinc-500">#00{{ item.id }}</td>
                         <td class="px-2 sm:px-4 py-3.5">
                           <strong class="text-zinc-200 block font-medium">{{ item.name }}</strong>
