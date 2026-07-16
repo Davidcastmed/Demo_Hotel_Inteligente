@@ -74,3 +74,207 @@ body {
   border-color: #3F3F46;
   background: #27272A;
 }
+
+/* LIGHT MODE STYLES */
+.light-mode {
+  background-color: #f9fafb !important;
+  color: #111827 !important;
+}
+
+.light-mode ::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Sidebar and Header */
+.light-mode aside {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+
+.light-mode header {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+
+/* All boxes/cards using dark background utilities */
+.light-mode .bg-zinc-950,
+.light-mode .bg-zinc-950\/60,
+.light-mode .bg-zinc-950\/80,
+.light-mode .bg-zinc-950\/40,
+.light-mode .bg-zinc-900,
+.light-mode .bg-zinc-900\/30,
+.light-mode .bg-zinc-900\/50,
+.light-mode .bg-zinc-900\/80,
+.light-mode .bg-[#0C0C0E],
+.light-mode .bg-[#09090B],
+.light-mode .bg-zinc-800\/20,
+.light-mode .bg-zinc-900\/40,
+.light-mode .bg-zinc-900\/90,
+.light-mode .bg-black\/40 {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Border colors */
+.light-mode .border-zinc-800,
+.light-mode .border-zinc-700,
+.light-mode .border-zinc-800\/50,
+.light-mode .border-zinc-700\/30,
+.light-mode .border-zinc-800\/20,
+.light-mode .divide-zinc-800,
+.light-mode .border-zinc-900,
+.light-mode .border-white\/10 {
+  border-color: #e5e7eb !important;
+}
+
+/* Text colors */
+.light-mode .text-zinc-100,
+.light-mode .text-zinc-200,
+.light-mode .text-zinc-300,
+.light-mode .text-zinc-400,
+.light-mode .text-zinc-500,
+.light-mode .text-white,
+.light-mode .text-zinc-100\/90 {
+  color: #1f2937 !important;
+}
+
+.light-mode .text-zinc-400 {
+  color: #4b5563 !important;
+}
+
+.light-mode .text-zinc-500 {
+  color: #6b7280 !important;
+}
+
+.light-mode .text-zinc-600 {
+  color: #4b5563 !important;
+}
+
+/* Specific text elements and icons */
+.light-mode p, 
+.light-mode h1, 
+.light-mode h2, 
+.light-mode h3, 
+.light-mode h4, 
+.light-mode h5, 
+.light-mode h6, 
+.light-mode span, 
+.light-mode label, 
+.light-mode th, 
+.light-mode td {
+  color: inherit;
+}
+
+/* Highlight / helper colors - keep contrast */
+.light-mode .text-indigo-400,
+.light-mode .text-indigo-500 {
+  color: #4f46e5 !important;
+}
+
+.light-mode .text-emerald-400,
+.light-mode .text-emerald-500 {
+  color: #059669 !important;
+}
+
+.light-mode .text-rose-400,
+.light-mode .text-rose-500 {
+  color: #dc2626 !important;
+}
+
+.light-mode .text-amber-400,
+.light-mode .text-amber-500 {
+  color: #d97706 !important;
+}
+
+/* Badges background replacements */
+.light-mode .bg-indigo-600\/10,
+.light-mode .bg-indigo-500\/10,
+.light-mode .bg-indigo-900\/20 {
+  background-color: #e0e7ff !important;
+}
+
+.light-mode .bg-emerald-500\/10,
+.light-mode .bg-emerald-600\/10,
+.light-mode .bg-emerald-900\/20 {
+  background-color: #d1fae5 !important;
+}
+
+.light-mode .bg-rose-500\/10,
+.light-mode .bg-rose-900\/20 {
+  background-color: #fee2e2 !important;
+}
+
+.light-mode .bg-amber-500\/10,
+.light-mode .bg-amber-900\/20 {
+  background-color: #fef3c7 !important;
+}
+
+/* Navigation button highlights */
+.light-mode .bg-zinc-800\/50,
+.light-mode .bg-zinc-800\/30 {
+  background-color: #f3f4f6 !important;
+}
+
+.light-mode .hover\:bg-zinc-800\/30:hover {
+  background-color: #e5e7eb !important;
+}
+
+.light-mode .hover\:bg-zinc-800\/50:hover {
+  background-color: #e5e7eb !important;
+}
+
+/* Inputs and interactive elements */
+.light-mode select,
+.light-mode input,
+.light-mode textarea {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: #d1d5db !important;
+}
+
+.light-mode select:focus,
+.light-mode input:focus,
+.light-mode textarea:focus {
+  border-color: #4f46e5 !important;
+}
+
+/* General button backdrops */
+.light-mode .bg-zinc-800 {
+  background-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+.light-mode .bg-zinc-900 {
+  background-color: #f3f4f6 !important;
+}
+
+/* Table headers & zebra stripes */
+.light-mode th {
+  background-color: #f9fafb !important;
+  color: #374151 !important;
+}
+
+.light-mode tr:hover {
+  background-color: #f9fafb !important;
+}
+
+/* Gradient block replacements */
+.light-mode .bg-gradient-to-r {
+  background-image: none !important;
+  background-color: #ffffff !important;
+}
+.light-mode .from-indigo-950\/30 {
+  background-color: #ffffff !important;
+}
+.light-mode .to-zinc-950\/10 {
+  background-color: #ffffff !important;
+}
+
+/* Specific component fixes for charts, lists and overlays */
+.light-mode .backdrop-blur-md,
+.light-mode .backdrop-blur-lg,
+.light-mode .backdrop-blur-sm {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+
