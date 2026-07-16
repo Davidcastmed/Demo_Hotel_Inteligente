@@ -390,10 +390,6 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
   // API State
   inventory: InventoryItem[] = [];
-  selectedItemIds: Set<string> = new Set<string>();
-  bulkCategory = '';
-  bulkLocation = '';
-  bulkThreshold: number | null = null;
   events: EventLog[] = [];
   people: Person[] = [];
   monthlyMovements: MonthlyMovement[] = [];
@@ -713,6 +709,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
   // Real-time camera stream visualizer simulation
   activeCamera: 'entrada' | 'cocina' | 'lavanderia' | 'bodega' | 'muelle' = 'entrada';
+  cameraViewMode: 'single' | 'grid' = 'single';
   cameraStatus: 'ONLINE' | 'RECORDING' | 'OFFLINE' = 'ONLINE';
   isSimulating = false;
   activeSimulationType: string | null = null;
@@ -1059,119 +1056,49 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     this.fetchData();
   }
 
-  // Multi-select methods
-  toggleSelectItem(itemId: string) {
-    if (this.selectedItemIds.has(itemId)) {
-      this.selectedItemIds.delete(itemId);
-    } else {
-      this.selectedItemIds.add(itemId);
-    }
-    this.cdr.markForCheck();
-  }
-
-  isItemSelected(itemId: string): boolean {
-    return this.selectedItemIds.has(itemId);
-  }
-
-  toggleSelectAllItems() {
-    if (this.selectedItemIds.size === this.inventory.length) {
-      this.selectedItemIds.clear();
-    } else {
-      this.inventory.forEach(item => this.selectedItemIds.add(item.id));
-    }
-    this.cdr.markForCheck();
-  }
-
-  isAllItemsSelected(): boolean {
-    return this.inventory.length > 0 && this.selectedItemIds.size === this.inventory.length;
-  }
-
-  applyBulkUpdates() {
-    if (this.selectedItemIds.size === 0) return;
-    
-    const updates: { category?: string; location?: string; threshold?: number } = {};
-    if (this.bulkCategory) {
-      updates.category = this.bulkCategory;
-    }
-    if (this.bulkLocation.trim()) {
-      updates.location = this.bulkLocation.trim();
-    }
-    if (this.bulkThreshold !== null && this.bulkThreshold !== undefined && this.bulkThreshold >= 0) {
-      updates.threshold = this.bulkThreshold;
-    }
-
-    if (Object.keys(updates).length === 0) {
-      return;
-    }
-
-    const ids = Array.from(this.selectedItemIds);
-    this.db.bulkUpdateItems(ids, updates);
-    this.fetchData();
-    
-    // Reset bulk form
-    this.bulkCategory = '';
-    this.bulkLocation = '';
-    this.bulkThreshold = null;
-    this.selectedItemIds.clear();
-    this.cdr.markForCheck();
-  }
-
-  clearBulkSelection() {
-    this.selectedItemIds.clear();
-    this.bulkCategory = '';
-    this.bulkLocation = '';
-    this.bulkThreshold = null;
-    this.cdr.markForCheck();
-  }
-
-  updateBulkThreshold(val: string) {
-    if (val === '' || val === null || val === undefined) {
-      this.bulkThreshold = null;
-    } else {
-      this.bulkThreshold = Number(val);
-    }
-    this.cdr.markForCheck();
-  }
-
   // Switch camera feed and update corresponding YOLO bounding boxes
-  switchCamera(cam: 'entrada' | 'cocina' | 'lavanderia' | 'bodega' | 'muelle') {
-    this.activeCamera = cam;
+  switchCamera(cam: string) {
+    this.activeCamera = cam as 'entrada' | 'cocina' | 'lavanderia' | 'bodega' | 'muelle';
     this.updateCameraDetections();
     this.cdr.markForCheck();
   }
 
-  updateCameraDetections() {
-    if (this.activeCamera === 'entrada') {
-      this.detections = [
+  getCameraDetections(cam: string): DetectionBox[] {
+    if (cam === 'entrada') {
+      return [
         { label: 'Fahrzeug: HH-MB-2026 [98.2%]', x: 15, y: 20, w: 30, h: 50, color: 'border-emerald-500 text-emerald-400 bg-emerald-500/10' },
         { label: 'Gast: Sarah Connor [97.5%]', x: 50, y: 25, w: 15, h: 65, color: 'border-indigo-500 text-indigo-400 bg-indigo-500/10' },
         { label: 'Gepäckwagen [95.4%]', x: 68, y: 45, w: 20, h: 45, color: 'border-amber-500 text-amber-400 bg-amber-500/10' }
       ];
-    } else if (this.activeCamera === 'cocina') {
-      this.detections = [
+    } else if (cam === 'cocina') {
+      return [
         { label: 'Person: Carlos M. [99.2%]', x: 20, y: 15, w: 22, h: 70, color: 'border-emerald-500 text-emerald-400 bg-emerald-500/10' },
         { label: 'Pfanne (Temp: 180°C)', x: 45, y: 40, w: 18, h: 20, color: 'border-rose-500 text-rose-400 bg-rose-500/10' },
         { label: 'Hygiene: Schutzhaube [OK]', x: 22, y: 10, w: 12, h: 10, color: 'border-blue-500 text-blue-400 bg-blue-500/10' }
       ];
-    } else if (this.activeCamera === 'lavanderia') {
-      this.detections = [
+    } else if (cam === 'lavanderia') {
+      return [
         { label: 'Waschmaschine #2 [AKTIV]', x: 15, y: 15, w: 30, h: 60, color: 'border-indigo-500 text-indigo-400 bg-indigo-500/10' },
         { label: 'Stapel Handtücher [40 Sets]', x: 55, y: 30, w: 18, h: 40, color: 'border-emerald-500 text-emerald-400 bg-emerald-500/10' },
         { label: 'Kanister: Waschmittel [15L]', x: 78, y: 40, w: 12, h: 30, color: 'border-amber-500 text-amber-400 bg-amber-500/10' }
       ];
-    } else if (this.activeCamera === 'bodega') {
-      this.detections = [
+    } else if (cam === 'bodega') {
+      return [
         { label: 'Person: Ana G. [Lager]', x: 45, y: 15, w: 20, h: 68, color: 'border-blue-500 text-blue-400 bg-blue-500/10' },
         { label: 'Kiste Coca-Cola [99.1%]', x: 70, y: 25, w: 14, h: 18, color: 'border-rose-500 text-rose-400 bg-rose-500/10' },
         { label: 'Regale A-B [Stand: 65%]', x: 10, y: 10, w: 25, h: 80, color: 'border-zinc-500 text-zinc-300 bg-zinc-500/10' }
       ];
     } else {
-      this.detections = [
+      return [
         { label: 'Lieferfahrzeug [96.7%]', x: 10, y: 10, w: 40, h: 80, color: 'border-indigo-500 text-indigo-400 bg-indigo-500/10' },
-        { label: 'Lieferant: Juan P. [99.0%]', x: 55, y: 30, w: 15, h: 60, color: 'border-cyan-500 text-cyan-400 bg-cyan-500/10' },
+        { label: 'Lieferant: Juan P. [99.0%]', x: 55, y: 30, w: 15, h: 60, color: 'border-cyan-500 text-cyan-400 bg-cyan-400/10' },
         { label: 'Transportwagen [94.5%]', x: 72, y: 50, w: 18, h: 35, color: 'border-purple-500 text-purple-400 bg-purple-500/10' }
       ];
     }
+  }
+
+  updateCameraDetections() {
+    this.detections = this.getCameraDetections(this.activeCamera);
   }
 
   // Active AI simulation sequence showing the deep visual pipeline logs to users

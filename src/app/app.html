@@ -1034,193 +1034,321 @@
             <!-- Left Side: Interactive Live Camera Stream Simulator -->
             <div class="lg:col-span-8 space-y-4">
               
-              <!-- Camera Switcher -->
-              <div class="flex flex-col bg-zinc-900/30 border border-zinc-800 p-3 rounded-xl gap-3">
-                <div class="flex flex-wrap gap-2 w-full">
-                  <button 
-                    (click)="switchCamera('entrada')"
-                    [class.bg-indigo-600]="activeCamera === 'entrada'"
-                    [class.text-white]="activeCamera === 'entrada'"
-                    [class.bg-zinc-800/50]="activeCamera !== 'entrada'"
-                    [class.text-zinc-400]="activeCamera !== 'entrada'"
-                    class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
-                  >
-                    CAM_01: Haupteingang / Lobby
-                  </button>
-                  <button 
-                    (click)="switchCamera('cocina')"
-                    [class.bg-indigo-600]="activeCamera === 'cocina'"
-                    [class.text-white]="activeCamera === 'cocina'"
-                    [class.bg-zinc-800/50]="activeCamera !== 'cocina'"
-                    [class.text-zinc-400]="activeCamera !== 'cocina'"
-                    class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
-                  >
-                    CAM_02: Hauptküche
-                  </button>
-                  <button 
-                    (click)="switchCamera('lavanderia')"
-                    [class.bg-indigo-600]="activeCamera === 'lavanderia'"
-                    [class.text-white]="activeCamera === 'lavanderia'"
-                    [class.bg-zinc-800/50]="activeCamera !== 'lavanderia'"
-                    [class.text-zinc-400]="activeCamera !== 'lavanderia'"
-                    class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
-                  >
-                    CAM_03: Wäscherei
-                  </button>
-                  <button 
-                    (click)="switchCamera('bodega')"
-                    [class.bg-indigo-600]="activeCamera === 'bodega'"
-                    [class.text-white]="activeCamera === 'bodega'"
-                    [class.bg-zinc-800/50]="activeCamera !== 'bodega'"
-                    [class.text-zinc-400]="activeCamera !== 'bodega'"
-                    class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
-                  >
-                    CAM_04: Zentrallager
-                  </button>
-                  <button 
-                    (click)="switchCamera('muelle')"
-                    [class.bg-indigo-600]="activeCamera === 'muelle'"
-                    [class.text-white]="activeCamera === 'muelle'"
-                    [class.bg-zinc-800/50]="activeCamera !== 'muelle'"
-                    [class.text-zinc-400]="activeCamera !== 'muelle'"
-                    class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
-                  >
-                    CAM_05: Laderampe
-                  </button>
+              <!-- View Mode Toggle (Very prominent) -->
+              <div class="flex flex-col sm:flex-row items-center justify-between bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl gap-4 mb-2">
+                <div>
+                  <h3 class="text-sm font-semibold text-zinc-100 flex items-center gap-2">
+                    <mat-icon class="text-indigo-400">videocam</mat-icon>
+                    Sicherheits- & Bestands-Kameras
+                  </h3>
+                  <p class="text-[11px] text-zinc-400 font-sans mt-0.5">Live-Überwachung & KI-gestützte Objekterkennung</p>
                 </div>
-
-                <div class="flex items-center justify-between text-xs font-mono text-zinc-300">
-                  <div class="flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                    <span>Aktiviertes Signal:</span>
-                    <strong class="text-zinc-100">
-                      @if (activeCamera === 'entrada') { CAM_01: Haupteingang / Lobby }
-                      @else if (activeCamera === 'cocina') { CAM_02: Hauptküche / Kochbereich }
-                      @else if (activeCamera === 'lavanderia') { CAM_03: Wäscherei & Leinen }
-                      @else if (activeCamera === 'bodega') { CAM_04: Zentrallager }
-                      @else { CAM_05: Laderampe / Lieferungen }
-                    </strong>
-                  </div>
-                  <span class="text-[10px] text-zinc-500 hidden sm:inline">Neuronales Netzwerk: YOLOv10 & SAM2</span>
-                </div>
-              </div>
-
-              <!-- Interactive Camera Box overlay -->
-              <div class="relative aspect-video w-full rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800 shadow-[0_12px_36px_rgba(0,0,0,0.6)]">
-                <!-- Scanline effects -->
-                <div class="absolute inset-0 scanline-effect opacity-10 pointer-events-none"></div>
-
-                <!-- Laser Scanning line effect when scanning -->
-                @if (cameraScanning) {
-                  <div class="absolute inset-0 z-20 pointer-events-none">
-                    <!-- Scanner Laser Beam -->
-                    <div class="absolute left-0 right-0 h-1 bg-emerald-500 shadow-[0_0_15px_#10b981] animate-scanner-laser"></div>
-                    <!-- Full screen scanning green hue tint -->
-                    <div class="absolute inset-0 bg-emerald-500/5 animate-pulse"></div>
-                    <!-- Status watermark -->
-                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/90 text-emerald-400 font-mono text-[10px] tracking-[0.2em] uppercase py-2 px-4 rounded-md border border-emerald-500/30 shadow-2xl flex items-center gap-2">
-                      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                      KI BILDANALYSE LÄUFT...
-                    </div>
-                  </div>
-                }
-
-                <!-- HUD: Last Detected Item Over the CCTV Stream -->
-                @if (lastDetectedItem) {
-                  <div class="absolute bottom-14 left-4 z-20 pointer-events-none max-w-sm bg-zinc-950/95 border border-zinc-800 rounded-lg p-3 shadow-2xl backdrop-blur-md animate-fade-in">
-                    <div class="flex items-center justify-between border-b border-zinc-850 pb-1.5 mb-1.5 gap-4">
-                      <div class="flex items-center gap-1.5 text-[9px] font-mono tracking-wider text-indigo-400">
-                        <span class="w-1 h-1 bg-indigo-400 rounded-full animate-ping"></span>
-                        OBJEKT ERFASST (CAM SCANNER)
-                      </div>
-                      <span class="text-[8px] font-mono text-zinc-500 shrink-0">{{ lastDetectedItem.timestamp }}</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
-                        <mat-icon class="text-sm" [class.text-emerald-400]="lastDetectedItem.change > 0" [class.text-rose-400]="lastDetectedItem.change < 0">
-                          {{ lastDetectedItem.change > 0 ? 'add_shopping_cart' : 'remove_shopping_cart' }}
-                        </mat-icon>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <div class="text-[11px] font-medium text-zinc-100 truncate">{{ lastDetectedItem.name }}</div>
-                        <div class="text-[9px] text-zinc-500 font-mono mt-0.5">{{ lastDetectedItem.camera }}</div>
-                      </div>
-                      <div class="text-right shrink-0">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold" [class.bg-emerald-500/15]="lastDetectedItem.change > 0" [class.text-emerald-400]="lastDetectedItem.change > 0" [class.bg-rose-500/15]="lastDetectedItem.change < 0" [class.text-rose-400]="lastDetectedItem.change < 0">
-                          {{ lastDetectedItem.change > 0 ? '+' : '' }}{{ lastDetectedItem.change }} {{ lastDetectedItem.unit }}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                }
                 
-                <!-- grayscaled visual backgrounds representing cctv -->
-                @if (activeCamera === 'entrada') {
-                  <img src="/images/hotel_lobby_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Haupteingang Lobby" referrerpolicy="no-referrer">
-                } @else if (activeCamera === 'cocina') {
-                  <img src="/images/hotel_kitchen_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Hauptkueche" referrerpolicy="no-referrer">
-                } @else if (activeCamera === 'lavanderia') {
-                  <img src="/images/hotel_laundry_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Waescherei" referrerpolicy="no-referrer">
-                } @else if (activeCamera === 'bodega') {
-                  <img src="/images/hotel_warehouse_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Lagerkamera" referrerpolicy="no-referrer">
-                } @else {
-                  <img src="/images/hotel_dock_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Laderampenkamera" referrerpolicy="no-referrer">
-                }
+                <!-- Toggle buttons with active/inactive states -->
+                <div class="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800 w-full sm:w-auto">
+                  <button 
+                    (click)="cameraViewMode = 'single'"
+                    [class.bg-indigo-600]="cameraViewMode === 'single'"
+                    [class.text-white]="cameraViewMode === 'single'"
+                    [class.bg-transparent]="cameraViewMode !== 'single'"
+                    [class.text-zinc-400]="cameraViewMode !== 'single'"
+                    class="px-4 py-2 rounded-md text-xs font-semibold cursor-pointer transition-all flex items-center justify-center gap-2 flex-1 sm:flex-none border-none outline-none"
+                  >
+                    <mat-icon class="text-base">photo_camera</mat-icon>
+                    Einzelkamera
+                  </button>
+                  <button 
+                    (click)="cameraViewMode = 'grid'"
+                    [class.bg-indigo-600]="cameraViewMode === 'grid'"
+                    [class.text-white]="cameraViewMode === 'grid'"
+                    [class.bg-transparent]="cameraViewMode !== 'grid'"
+                    [class.text-zinc-400]="cameraViewMode !== 'grid'"
+                    class="px-4 py-2 rounded-md text-xs font-semibold cursor-pointer transition-all flex items-center justify-center gap-2 flex-1 sm:flex-none border-none outline-none relative overflow-visible"
+                  >
+                    <mat-icon class="text-base">grid_view</mat-icon>
+                    <span>Multi-View (Grid)</span>
+                    <span class="absolute -top-1 -right-1 flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  </button>
+                </div>
+              </div>
 
-                <!-- Calibration lines overlay -->
-                <div class="absolute inset-0 border border-zinc-800/30 pointer-events-none z-0"></div>
-                <div class="absolute top-1/2 left-0 right-0 h-px bg-zinc-800/10 pointer-events-none"></div>
-                <div class="absolute left-1/2 top-0 bottom-0 w-px bg-zinc-800/10 pointer-events-none"></div>
-
-                <!-- CCTV status indicators overlay -->
-                <div class="absolute inset-0 flex flex-col justify-between p-5 z-10 pointer-events-none">
-                  <div class="flex justify-between items-start">
-                    <div class="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-mono tracking-wider text-zinc-300 flex items-center gap-1.5 border border-zinc-800">
-                      <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                      REC [{{ 
-                        activeCamera === 'entrada' ? 'CAM_01_HAUPTEINGANG' :
-                        activeCamera === 'cocina' ? 'CAM_02_HAUPTKUECHE' :
-                        activeCamera === 'lavanderia' ? 'CAM_03_WAESCHEREI' :
-                        activeCamera === 'bodega' ? 'CAM_04_ZENTRALLAGER' : 'CAM_05_LADERAMPE'
-                      }}]
-                    </div>
-                    <div class="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-mono tracking-wider text-zinc-400 border border-zinc-800">
-                      FPS: 30.0 | RES: 1080P | LAT: 42ms
-                    </div>
+              @if (cameraViewMode === 'single') {
+                <!-- Camera Switcher -->
+                <div class="flex flex-col bg-zinc-900/30 border border-zinc-800 p-3 rounded-xl gap-3 animate-fade-in">
+                  <div class="flex flex-wrap gap-2 w-full">
+                    <button 
+                      (click)="switchCamera('entrada')"
+                      [class.bg-indigo-600]="activeCamera === 'entrada'"
+                      [class.text-white]="activeCamera === 'entrada'"
+                      [class.bg-zinc-800/50]="activeCamera !== 'entrada'"
+                      [class.text-zinc-400]="activeCamera !== 'entrada'"
+                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                    >
+                      CAM_01: Haupteingang / Lobby
+                    </button>
+                    <button 
+                      (click)="switchCamera('cocina')"
+                      [class.bg-indigo-600]="activeCamera === 'cocina'"
+                      [class.text-white]="activeCamera === 'cocina'"
+                      [class.bg-zinc-800/50]="activeCamera !== 'cocina'"
+                      [class.text-zinc-400]="activeCamera !== 'cocina'"
+                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                    >
+                      CAM_02: Hauptküche
+                    </button>
+                    <button 
+                      (click)="switchCamera('lavanderia')"
+                      [class.bg-indigo-600]="activeCamera === 'lavanderia'"
+                      [class.text-white]="activeCamera === 'lavanderia'"
+                      [class.bg-zinc-800/50]="activeCamera !== 'lavanderia'"
+                      [class.text-zinc-400]="activeCamera !== 'lavanderia'"
+                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                    >
+                      CAM_03: Wäscherei
+                    </button>
+                    <button 
+                      (click)="switchCamera('bodega')"
+                      [class.bg-indigo-600]="activeCamera === 'bodega'"
+                      [class.text-white]="activeCamera === 'bodega'"
+                      [class.bg-zinc-800/50]="activeCamera !== 'bodega'"
+                      [class.text-zinc-400]="activeCamera !== 'bodega'"
+                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                    >
+                      CAM_04: Zentrallager
+                    </button>
+                    <button 
+                      (click)="switchCamera('muelle')"
+                      [class.bg-indigo-600]="activeCamera === 'muelle'"
+                      [class.text-white]="activeCamera === 'muelle'"
+                      [class.bg-zinc-800/50]="activeCamera !== 'muelle'"
+                      [class.text-zinc-400]="activeCamera !== 'muelle'"
+                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                    >
+                      CAM_05: Laderampe
+                    </button>
                   </div>
-                  
-                  <div class="flex justify-between items-end">
-                    <div class="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-mono text-zinc-500 border border-zinc-800">
-                      ISO: 400 | SHUTTER: 1/60s
+
+                  <div class="flex items-center justify-between text-xs font-mono text-zinc-300">
+                    <div class="flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                      <span>Aktiviertes Signal:</span>
+                      <strong class="text-zinc-100">
+                        @if (activeCamera === 'entrada') { CAM_01: Haupteingang / Lobby }
+                        @else if (activeCamera === 'cocina') { CAM_02: Hauptküche / Kochbereich }
+                        @else if (activeCamera === 'lavanderia') { CAM_03: Wäscherei & Leinen }
+                        @else if (activeCamera === 'bodega') { CAM_04: Zentrallager }
+                        @else { CAM_05: Laderampe / Lieferungen }
+                      </strong>
                     </div>
-                    <div class="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-mono text-zinc-300 border border-zinc-800">
-                      {{ getCurrentTime() }}
-                    </div>
+                    <span class="text-[10px] text-zinc-500 hidden sm:inline">Neuronales Netzwerk: YOLOv10 & SAM2</span>
                   </div>
                 </div>
 
-                <!-- Dynamic Bounding Boxes -->
-                @for (det of detections; track det.label) {
-                  <div 
-                    class="absolute border rounded pointer-events-none transition-all duration-300 flex flex-col justify-start"
-                    [ngClass]="det.color"
-                    [style.left.%]="det.x" 
-                    [style.top.%]="det.y" 
-                    [style.width.%]="det.w" 
-                    [style.height.%]="det.h"
-                  >
-                    <div class="bg-black/85 px-1.5 py-0.5 text-[9px] font-mono tracking-wider uppercase border-b border-inherit truncate text-white">
-                      {{ det.label }}
+                <!-- Interactive Camera Box overlay -->
+                <div class="relative aspect-video w-full rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800 shadow-[0_12px_36px_rgba(0,0,0,0.6)]">
+                  <!-- Scanline effects -->
+                  <div class="absolute inset-0 scanline-effect opacity-10 pointer-events-none"></div>
+
+                  <!-- Laser Scanning line effect when scanning -->
+                  @if (cameraScanning) {
+                    <div class="absolute inset-0 z-20 pointer-events-none">
+                      <!-- Scanner Laser Beam -->
+                      <div class="absolute left-0 right-0 h-1 bg-emerald-500 shadow-[0_0_15px_#10b981] animate-scanner-laser"></div>
+                      <!-- Full screen scanning green hue tint -->
+                      <div class="absolute inset-0 bg-emerald-500/5 animate-pulse"></div>
+                      <!-- Status watermark -->
+                      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/90 text-emerald-400 font-mono text-[10px] tracking-[0.2em] uppercase py-2 px-4 rounded-md border border-emerald-500/30 shadow-2xl flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                        KI BILDANALYSE LÄUFT...
+                      </div>
+                    </div>
+                  }
+
+                  <!-- HUD: Last Detected Item Over the CCTV Stream -->
+                  @if (lastDetectedItem) {
+                    <div class="absolute bottom-14 left-4 z-20 pointer-events-none max-w-sm bg-zinc-950/95 border border-zinc-800 rounded-lg p-3 shadow-2xl backdrop-blur-md animate-fade-in">
+                      <div class="flex items-center justify-between border-b border-zinc-850 pb-1.5 mb-1.5 gap-4">
+                        <div class="flex items-center gap-1.5 text-[9px] font-mono tracking-wider text-indigo-400">
+                          <span class="w-1 h-1 bg-indigo-400 rounded-full animate-ping"></span>
+                          OBJEKT ERFASST (CAM SCANNER)
+                        </div>
+                        <span class="text-[8px] font-mono text-zinc-500 shrink-0">{{ lastDetectedItem.timestamp }}</span>
+                      </div>
+                      <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
+                          <mat-icon class="text-sm" [class.text-emerald-400]="lastDetectedItem.change > 0" [class.text-rose-400]="lastDetectedItem.change < 0">
+                            {{ lastDetectedItem.change > 0 ? 'add_shopping_cart' : 'remove_shopping_cart' }}
+                          </mat-icon>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <div class="text-[11px] font-medium text-zinc-100 truncate">{{ lastDetectedItem.name }}</div>
+                          <div class="text-[9px] text-zinc-500 font-mono mt-0.5">{{ lastDetectedItem.camera }}</div>
+                        </div>
+                        <div class="text-right shrink-0">
+                          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold" [class.bg-emerald-500/15]="lastDetectedItem.change > 0" [class.text-emerald-400]="lastDetectedItem.change > 0" [class.bg-rose-500/15]="lastDetectedItem.change < 0" [class.text-rose-400]="lastDetectedItem.change < 0">
+                            {{ lastDetectedItem.change > 0 ? '+' : '' }}{{ lastDetectedItem.change }} {{ lastDetectedItem.unit }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                  
+                  <!-- grayscaled visual backgrounds representing cctv -->
+                  @if (activeCamera === 'entrada') {
+                    <img src="/images/hotel_lobby_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Haupteingang Lobby" referrerpolicy="no-referrer">
+                  } @else if (activeCamera === 'cocina') {
+                    <img src="/images/hotel_kitchen_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Hauptkueche" referrerpolicy="no-referrer">
+                  } @else if (activeCamera === 'lavanderia') {
+                    <img src="/images/hotel_laundry_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Waescherei" referrerpolicy="no-referrer">
+                  } @else if (activeCamera === 'bodega') {
+                    <img src="/images/hotel_warehouse_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Lagerkamera" referrerpolicy="no-referrer">
+                  } @else {
+                    <img src="/images/hotel_dock_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125" alt="Laderampenkamera" referrerpolicy="no-referrer">
+                  }
+
+                  <!-- Calibration lines overlay -->
+                  <div class="absolute inset-0 border border-zinc-800/30 pointer-events-none z-0"></div>
+                  <div class="absolute top-1/2 left-0 right-0 h-px bg-zinc-800/10 pointer-events-none"></div>
+                  <div class="absolute left-1/2 top-0 bottom-0 w-px bg-zinc-800/10 pointer-events-none"></div>
+
+                  <!-- CCTV status indicators overlay -->
+                  <div class="absolute inset-0 flex flex-col justify-between p-5 z-10 pointer-events-none">
+                    <div class="flex justify-between items-start">
+                      <div class="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-mono tracking-wider text-zinc-300 flex items-center gap-1.5 border border-zinc-800">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                        REC [{{ 
+                          activeCamera === 'entrada' ? 'CAM_01_HAUPTEINGANG' :
+                          activeCamera === 'cocina' ? 'CAM_02_HAUPTKUECHE' :
+                          activeCamera === 'lavanderia' ? 'CAM_03_WAESCHEREI' :
+                          activeCamera === 'bodega' ? 'CAM_04_ZENTRALLAGER' : 'CAM_05_LADERAMPE'
+                        }}]
+                      </div>
+                      <div class="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-mono tracking-wider text-zinc-400 border border-zinc-800">
+                        FPS: 30.0 | RES: 1080P | LAT: 42ms
+                      </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-end">
+                      <div class="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-mono text-zinc-500 border border-zinc-800">
+                        ISO: 400 | SHUTTER: 1/60s
+                      </div>
+                      <div class="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-mono text-zinc-300 border border-zinc-800">
+                        {{ getCurrentTime() }}
+                      </div>
                     </div>
                   </div>
-                }
 
-                <!-- Scanning animation beam overlay during simulation -->
-                @if (isSimulating) {
-                  <div class="absolute top-0 left-0 right-0 h-0.5 bg-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.8)] animate-[scanline_2s_infinite_ease-in-out] pointer-events-none z-10"></div>
-                  <div class="absolute inset-0 bg-indigo-500/5 animate-pulse-slow pointer-events-none"></div>
-                }
-              </div>
+                  <!-- Dynamic Bounding Boxes -->
+                  @for (det of detections; track det.label) {
+                    <div 
+                      class="absolute border rounded pointer-events-none transition-all duration-300 flex flex-col justify-start"
+                      [ngClass]="det.color"
+                      [style.left.%]="det.x" 
+                      [style.top.%]="det.y" 
+                      [style.width.%]="det.w" 
+                      [style.height.%]="det.h"
+                    >
+                      <div class="bg-black/85 px-1.5 py-0.5 text-[9px] font-mono tracking-wider uppercase border-b border-inherit truncate text-white">
+                        {{ det.label }}
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Scanning animation beam overlay during simulation -->
+                  @if (isSimulating) {
+                    <div class="absolute top-0 left-0 right-0 h-0.5 bg-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.8)] animate-[scanline_2s_infinite_ease-in-out] pointer-events-none z-10"></div>
+                    <div class="absolute inset-0 bg-indigo-500/5 animate-pulse-slow pointer-events-none"></div>
+                  }
+                </div>
+              } @else {
+                <!-- Grid Layout for 5 Cameras simultaneously -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in mb-2">
+                  @for (cam of camerasHealth; track cam.id; let idx = $index) {
+                    <div 
+                      (click)="switchCamera(cam.id); cameraViewMode = 'single'"
+                      (keydown.enter)="switchCamera(cam.id); cameraViewMode = 'single'"
+                      (keydown.space)="switchCamera(cam.id); cameraViewMode = 'single'; $event.preventDefault()"
+                      tabindex="0"
+                      [class.md:col-span-2]="idx === 4"
+                      class="relative aspect-video rounded-xl overflow-hidden bg-zinc-950 border transition-all duration-300 cursor-pointer group hover:border-indigo-500/80 hover:shadow-[0_4px_20px_rgba(99,102,241,0.25)] border-zinc-800 focus:outline-none focus:border-indigo-500"
+                      [class.border-indigo-500]="activeCamera === cam.id"
+                    >
+                      <!-- Scanline effects -->
+                      <div class="absolute inset-0 scanline-effect opacity-10 pointer-events-none"></div>
+
+                      <!-- Background image representing cctv -->
+                      @if (cam.id === 'entrada') {
+                        <img src="/images/hotel_lobby_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125 transition-transform duration-500 group-hover:scale-102" alt="Haupteingang Lobby" referrerpolicy="no-referrer">
+                      } @else if (cam.id === 'cocina') {
+                        <img src="/images/hotel_kitchen_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125 transition-transform duration-500 group-hover:scale-102" alt="Hauptkueche" referrerpolicy="no-referrer">
+                      } @else if (cam.id === 'lavanderia') {
+                        <img src="/images/hotel_laundry_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125 transition-transform duration-500 group-hover:scale-102" alt="Waescherei" referrerpolicy="no-referrer">
+                      } @else if (cam.id === 'bodega') {
+                        <img src="/images/hotel_warehouse_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125 transition-transform duration-500 group-hover:scale-102" alt="Lagerkamera" referrerpolicy="no-referrer">
+                      } @else {
+                        <img src="/images/hotel_dock_cctv.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50 filter grayscale contrast-125 transition-transform duration-500 group-hover:scale-102" alt="Laderampenkamera" referrerpolicy="no-referrer">
+                      }
+
+                      <!-- Calibration lines overlay -->
+                      <div class="absolute inset-0 border border-zinc-800/20 pointer-events-none z-0"></div>
+                      <div class="absolute top-1/2 left-0 right-0 h-px bg-zinc-800/5 pointer-events-none"></div>
+                      <div class="absolute left-1/2 top-0 bottom-0 w-px bg-zinc-800/5 pointer-events-none"></div>
+
+                      <!-- CCTV status indicators overlay -->
+                      <div class="absolute inset-0 flex flex-col justify-between p-3.5 z-10 pointer-events-none">
+                        <div class="flex justify-between items-start">
+                          <div class="bg-black/85 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-mono tracking-wider text-zinc-300 flex items-center gap-1 border border-zinc-800/80">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500" [class.animate-pulse]="cam.status === 'ONLINE'"></span>
+                            REC [{{ cam.id === 'entrada' ? 'CAM_01' : cam.id === 'cocina' ? 'CAM_02' : cam.id === 'lavanderia' ? 'CAM_03' : cam.id === 'bodega' ? 'CAM_04' : 'CAM_05' }}]
+                          </div>
+                          <div class="bg-black/85 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-mono tracking-wider text-zinc-400 border border-zinc-800/80 flex items-center gap-1">
+                            @if (activeCamera === cam.id) {
+                              <span class="text-indigo-400 font-bold bg-indigo-500/15 px-1.5 py-0.5 rounded text-[8px] border border-indigo-500/20">PRIMÄR</span>
+                            }
+                            <span>{{ cam.fps }} FPS</span>
+                          </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-end">
+                          <div class="bg-black/85 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-mono text-zinc-300 border border-zinc-800/80">
+                            {{ cam.name }}
+                          </div>
+                          <div class="bg-black/85 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-mono text-zinc-300 border border-zinc-800/80">
+                            {{ getCurrentTime() }}
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Dynamic Bounding Boxes inside grid -->
+                      @for (det of getCameraDetections(cam.id); track det.label) {
+                        <div 
+                          class="absolute border rounded pointer-events-none transition-all duration-300 flex flex-col justify-start"
+                          [ngClass]="det.color"
+                          [style.left.%]="det.x" 
+                          [style.top.%]="det.y" 
+                          [style.width.%]="det.w" 
+                          [style.height.%]="det.h"
+                        >
+                          <div class="bg-black/85 px-1 py-0.5 text-[7px] leading-tight font-mono tracking-wider uppercase border-b border-inherit truncate text-white">
+                            {{ det.label }}
+                          </div>
+                        </div>
+                      }
+
+                      <!-- Laser scanning line if simulating/active and scanning -->
+                      @if (cameraScanning && activeCamera === cam.id) {
+                        <div class="absolute inset-0 z-20 pointer-events-none">
+                          <div class="absolute left-0 right-0 h-0.5 bg-emerald-500 shadow-[0_0_10px_#10b981] animate-scanner-laser"></div>
+                          <div class="absolute inset-0 bg-emerald-500/5"></div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
 
               <!-- Real-time Algorithm Inspector Panel -->
               <div class="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-5 space-y-4">
