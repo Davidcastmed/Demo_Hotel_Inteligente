@@ -1034,60 +1034,47 @@
             <!-- Left Side: Interactive Live Camera Stream Simulator -->
             <div class="lg:col-span-8 space-y-4">
               
-              <!-- View Mode Toggle (Very prominent) -->
-              <div class="flex flex-col sm:flex-row items-center justify-between bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl gap-4 mb-2">
-                <div>
-                  <h3 class="text-sm font-semibold text-zinc-100 flex items-center gap-2">
-                    <mat-icon class="text-indigo-400">videocam</mat-icon>
-                    Sicherheits- & Bestands-Kameras
-                  </h3>
-                  <p class="text-[11px] text-zinc-400 font-sans mt-0.5">Live-Überwachung & KI-gestützte Objekterkennung</p>
+              <!-- Camera Switcher -->
+              <div class="flex flex-col bg-zinc-900/30 border border-zinc-800 p-3 rounded-xl gap-3">
+                <!-- Mode Toggle (Einzel vs Multi-View) -->
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-2 mb-0.5">
+                  <span class="text-xs font-semibold text-zinc-400 font-mono tracking-wider">LIVE-VIDEOÜBERWACHUNG</span>
+                  <div class="flex bg-zinc-950 p-0.5 rounded-lg border border-zinc-850">
+                    <button 
+                      (click)="cameraViewMode = 'single'"
+                      [class.bg-indigo-600]="cameraViewMode === 'single'"
+                      [class.text-white]="cameraViewMode === 'single'"
+                      [class.text-zinc-500]="cameraViewMode !== 'single'"
+                      class="px-2.5 py-1 rounded text-[10px] font-medium transition-all cursor-pointer border-none bg-transparent flex items-center justify-center gap-1.5"
+                    >
+                      <mat-icon class="text-[12px] w-3 h-3 flex items-center justify-center shrink-0 text-inherit">photo_camera</mat-icon>
+                      <span>Einzelansicht</span>
+                    </button>
+                    <button 
+                      (click)="cameraViewMode = 'grid'"
+                      [class.bg-indigo-600]="cameraViewMode === 'grid'"
+                      [class.text-white]="cameraViewMode === 'grid'"
+                      [class.text-zinc-500]="cameraViewMode !== 'grid'"
+                      class="px-2.5 py-1 rounded text-[10px] font-medium transition-all cursor-pointer border-none bg-transparent flex items-center justify-center gap-1.5"
+                    >
+                      <mat-icon class="text-[12px] w-3 h-3 flex items-center justify-center shrink-0 text-inherit">grid_view</mat-icon>
+                      <span>Multi-View (Grid)</span>
+                    </button>
+                  </div>
                 </div>
-                
-                <!-- Toggle buttons with active/inactive states -->
-                <div class="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800 w-full sm:w-auto">
-                  <button 
-                    (click)="cameraViewMode = 'single'"
-                    [class.bg-indigo-600]="cameraViewMode === 'single'"
-                    [class.text-white]="cameraViewMode === 'single'"
-                    [class.bg-transparent]="cameraViewMode !== 'single'"
-                    [class.text-zinc-400]="cameraViewMode !== 'single'"
-                    class="px-4 py-2 rounded-md text-xs font-semibold cursor-pointer transition-all flex items-center justify-center gap-2 flex-1 sm:flex-none border-none outline-none"
-                  >
-                    <mat-icon class="text-base">photo_camera</mat-icon>
-                    Einzelkamera
-                  </button>
-                  <button 
-                    (click)="cameraViewMode = 'grid'"
-                    [class.bg-indigo-600]="cameraViewMode === 'grid'"
-                    [class.text-white]="cameraViewMode === 'grid'"
-                    [class.bg-transparent]="cameraViewMode !== 'grid'"
-                    [class.text-zinc-400]="cameraViewMode !== 'grid'"
-                    class="px-4 py-2 rounded-md text-xs font-semibold cursor-pointer transition-all flex items-center justify-center gap-2 flex-1 sm:flex-none border-none outline-none relative overflow-visible"
-                  >
-                    <mat-icon class="text-base">grid_view</mat-icon>
-                    <span>Multi-View (Grid)</span>
-                    <span class="absolute -top-1 -right-1 flex h-2 w-2">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                  </button>
-                </div>
-              </div>
 
-              @if (cameraViewMode === 'single') {
-                <!-- Camera Switcher -->
-                <div class="flex flex-col bg-zinc-900/30 border border-zinc-800 p-3 rounded-xl gap-3 animate-fade-in">
-                  <div class="flex flex-wrap gap-2 w-full">
+                @if (cameraViewMode === 'single') {
+                  <div class="flex flex-wrap gap-2 w-full animate-fade-in">
                     <button 
                       (click)="switchCamera('entrada')"
                       [class.bg-indigo-600]="activeCamera === 'entrada'"
                       [class.text-white]="activeCamera === 'entrada'"
                       [class.bg-zinc-800/50]="activeCamera !== 'entrada'"
                       [class.text-zinc-400]="activeCamera !== 'entrada'"
-                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all flex items-center justify-center gap-1.5 flex-1 sm:flex-none border-none outline-none"
                     >
-                      CAM_01: Haupteingang / Lobby
+                      <mat-icon class="text-[14px] w-3.5 h-3.5 flex items-center justify-center shrink-0 text-inherit">door_front</mat-icon>
+                      <span>CAM_01: Haupteingang / Lobby</span>
                     </button>
                     <button 
                       (click)="switchCamera('cocina')"
@@ -1095,9 +1082,10 @@
                       [class.text-white]="activeCamera === 'cocina'"
                       [class.bg-zinc-800/50]="activeCamera !== 'cocina'"
                       [class.text-zinc-400]="activeCamera !== 'cocina'"
-                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all flex items-center justify-center gap-1.5 flex-1 sm:flex-none border-none outline-none"
                     >
-                      CAM_02: Hauptküche
+                      <mat-icon class="text-[14px] w-3.5 h-3.5 flex items-center justify-center shrink-0 text-inherit">restaurant</mat-icon>
+                      <span>CAM_02: Hauptküche</span>
                     </button>
                     <button 
                       (click)="switchCamera('lavanderia')"
@@ -1105,9 +1093,10 @@
                       [class.text-white]="activeCamera === 'lavanderia'"
                       [class.bg-zinc-800/50]="activeCamera !== 'lavanderia'"
                       [class.text-zinc-400]="activeCamera !== 'lavanderia'"
-                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all flex items-center justify-center gap-1.5 flex-1 sm:flex-none border-none outline-none"
                     >
-                      CAM_03: Wäscherei
+                      <mat-icon class="text-[14px] w-3.5 h-3.5 flex items-center justify-center shrink-0 text-inherit">local_laundry_service</mat-icon>
+                      <span>CAM_03: Wäscherei</span>
                     </button>
                     <button 
                       (click)="switchCamera('bodega')"
@@ -1115,9 +1104,10 @@
                       [class.text-white]="activeCamera === 'bodega'"
                       [class.bg-zinc-800/50]="activeCamera !== 'bodega'"
                       [class.text-zinc-400]="activeCamera !== 'bodega'"
-                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all flex items-center justify-center gap-1.5 flex-1 sm:flex-none border-none outline-none"
                     >
-                      CAM_04: Zentrallager
+                      <mat-icon class="text-[14px] w-3.5 h-3.5 flex items-center justify-center shrink-0 text-inherit">inventory_2</mat-icon>
+                      <span>CAM_04: Zentrallager</span>
                     </button>
                     <button 
                       (click)="switchCamera('muelle')"
@@ -1125,9 +1115,10 @@
                       [class.text-white]="activeCamera === 'muelle'"
                       [class.bg-zinc-800/50]="activeCamera !== 'muelle'"
                       [class.text-zinc-400]="activeCamera !== 'muelle'"
-                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all text-center flex-1 sm:flex-none"
+                      class="px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-pointer transition-all flex items-center justify-center gap-1.5 flex-1 sm:flex-none border-none outline-none"
                     >
-                      CAM_05: Laderampe
+                      <mat-icon class="text-[14px] w-3.5 h-3.5 flex items-center justify-center shrink-0 text-inherit">local_shipping</mat-icon>
+                      <span>CAM_05: Laderampe</span>
                     </button>
                   </div>
 
@@ -1135,20 +1126,43 @@
                     <div class="flex items-center gap-2">
                       <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
                       <span>Aktiviertes Signal:</span>
-                      <strong class="text-zinc-100">
-                        @if (activeCamera === 'entrada') { CAM_01: Haupteingang / Lobby }
-                        @else if (activeCamera === 'cocina') { CAM_02: Hauptküche / Kochbereich }
-                        @else if (activeCamera === 'lavanderia') { CAM_03: Wäscherei & Leinen }
-                        @else if (activeCamera === 'bodega') { CAM_04: Zentrallager }
-                        @else { CAM_05: Laderampe / Lieferungen }
+                      <strong class="text-zinc-100 flex items-center gap-1.5">
+                        @if (activeCamera === 'entrada') {
+                          <mat-icon class="text-[12px] w-3 h-3 text-indigo-400">door_front</mat-icon>
+                          <span>CAM_01: Haupteingang / Lobby</span>
+                        } @else if (activeCamera === 'cocina') {
+                          <mat-icon class="text-[12px] w-3 h-3 text-indigo-400">restaurant</mat-icon>
+                          <span>CAM_02: Hauptküche / Kochbereich</span>
+                        } @else if (activeCamera === 'lavanderia') {
+                          <mat-icon class="text-[12px] w-3 h-3 text-indigo-400">local_laundry_service</mat-icon>
+                          <span>CAM_03: Wäscherei & Leinen</span>
+                        } @else if (activeCamera === 'bodega') {
+                          <mat-icon class="text-[12px] w-3 h-3 text-indigo-400">inventory_2</mat-icon>
+                          <span>CAM_04: Zentrallager</span>
+                        } @else {
+                          <mat-icon class="text-[12px] w-3 h-3 text-indigo-400">local_shipping</mat-icon>
+                          <span>CAM_05: Laderampe / Lieferungen</span>
+                        }
                       </strong>
                     </div>
                     <span class="text-[10px] text-zinc-500 hidden sm:inline">Neuronales Netzwerk: YOLOv10 & SAM2</span>
                   </div>
-                </div>
+                } @else {
+                  <div class="flex items-center justify-between text-xs font-mono text-zinc-300 animate-fade-in">
+                    <div class="flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      <span>Multi-View-Grid:</span>
+                      <strong class="text-zinc-100">Alle 5 Kamera-Streams gleichzeitig aktiv</strong>
+                    </div>
+                    <span class="text-[10px] text-zinc-400">Kamera anklicken für Einzelansicht</span>
+                  </div>
+                }
+              </div>
 
+              <!-- Single View Layout -->
+              @if (cameraViewMode === 'single') {
                 <!-- Interactive Camera Box overlay -->
-                <div class="relative aspect-video w-full rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800 shadow-[0_12px_36px_rgba(0,0,0,0.6)]">
+                <div class="relative aspect-video w-full rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800 shadow-[0_12px_36px_rgba(0,0,0,0.6)] animate-fade-in">
                   <!-- Scanline effects -->
                   <div class="absolute inset-0 scanline-effect opacity-10 pointer-events-none"></div>
 
@@ -1265,7 +1279,7 @@
                 </div>
               } @else {
                 <!-- Grid Layout for 5 Cameras simultaneously -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in mb-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
                   @for (cam of camerasHealth; track cam.id; let idx = $index) {
                     <div 
                       (click)="switchCamera(cam.id); cameraViewMode = 'single'"
@@ -1313,8 +1327,19 @@
                         </div>
                         
                         <div class="flex justify-between items-end">
-                          <div class="bg-black/85 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-mono text-zinc-300 border border-zinc-800/80">
-                            {{ cam.name }}
+                          <div class="bg-black/85 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-mono text-zinc-300 border border-zinc-800/80 flex items-center gap-1.5">
+                            @if (cam.id === 'entrada') {
+                              <mat-icon class="text-[11px] w-3 h-3 text-indigo-400">door_front</mat-icon>
+                            } @else if (cam.id === 'cocina') {
+                              <mat-icon class="text-[11px] w-3 h-3 text-indigo-400">restaurant</mat-icon>
+                            } @else if (cam.id === 'lavanderia') {
+                              <mat-icon class="text-[11px] w-3 h-3 text-indigo-400">local_laundry_service</mat-icon>
+                            } @else if (cam.id === 'bodega') {
+                              <mat-icon class="text-[11px] w-3 h-3 text-indigo-400">inventory_2</mat-icon>
+                            } @else {
+                              <mat-icon class="text-[11px] w-3 h-3 text-indigo-400">local_shipping</mat-icon>
+                            }
+                            <span>{{ cam.name }}</span>
                           </div>
                           <div class="bg-black/85 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-mono text-zinc-300 border border-zinc-800/80">
                             {{ getCurrentTime() }}
@@ -1751,93 +1776,11 @@
                 </div>
               </div>
 
-              <!-- Bulk Action Panel -->
-              @if (selectedItemIds.size > 0) {
-                <div class="mb-5 p-4 bg-indigo-500/5 border border-indigo-500/20 rounded-xl space-y-3 animate-fade-in text-zinc-300">
-                  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <div>
-                      <h4 class="text-xs font-bold text-indigo-400 flex items-center gap-1.5 uppercase tracking-wider">
-                        <mat-icon class="text-sm w-4 h-4">edit_note</mat-icon>
-                        Mehrfachauswahl-Aktionen
-                      </h4>
-                      <p class="text-[10px] text-zinc-500 mt-0.5">
-                        Sie haben <strong>{{ selectedItemIds.size }}</strong> {{ selectedItemIds.size === 1 ? 'Artikel' : 'Artikel' }} ausgewählt. Wählen Sie die zu aktualisierenden Felder:
-                      </p>
-                    </div>
-                    <button (click)="clearBulkSelection()" class="text-[10px] px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 cursor-pointer transition-colors border-none bg-transparent">
-                      Auswahl aufheben
-                    </button>
-                  </div>
-                  
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-                    <!-- Category selection -->
-                    <div class="space-y-1">
-                      <span class="text-[10px] font-semibold text-zinc-400 block font-mono">NEUE KATEGORIE</span>
-                      <select 
-                        #catSelect
-                        [value]="bulkCategory"
-                        (change)="bulkCategory = catSelect.value"
-                        class="w-full bg-zinc-950/60 border border-zinc-800 rounded px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500 transition-colors"
-                      >
-                        <option value="">- Unverändert -</option>
-                        @for (cat of categories; track cat) {
-                          @if (cat !== 'Alle') {
-                            <option [value]="cat">{{ cat }}</option>
-                          }
-                        }
-                      </select>
-                    </div>
-
-                    <!-- Location selection -->
-                    <div class="space-y-1">
-                      <span class="text-[10px] font-semibold text-zinc-400 block font-mono">NEUER LAGERORT</span>
-                      <input 
-                        type="text" 
-                        #locInput
-                        [value]="bulkLocation"
-                        (input)="bulkLocation = locInput.value"
-                        placeholder="- Unverändert - (z.B. Regal B-3)"
-                        class="w-full bg-zinc-950/60 border border-zinc-800 rounded px-2 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
-                      >
-                    </div>
-
-                    <!-- Threshold selection -->
-                    <div class="space-y-1">
-                      <span class="text-[10px] font-semibold text-zinc-400 block font-mono">NEUER SCHWELLENWERT (MIN)</span>
-                      <input 
-                        type="number" 
-                        #threshInput
-                        [value]="bulkThreshold === null ? '' : bulkThreshold"
-                        (input)="updateBulkThreshold(threshInput.value)"
-                        placeholder="- Unverändert -"
-                        class="w-full bg-zinc-950/60 border border-zinc-800 rounded px-2 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
-                      >
-                    </div>
-                  </div>
-
-                  <div class="flex justify-end gap-2 pt-2 border-t border-indigo-500/10">
-                    <button 
-                      (click)="applyBulkUpdates()"
-                      [disabled]="!bulkCategory && !bulkLocation.trim() && (bulkThreshold === null || bulkThreshold === undefined)"
-                      class="text-xs px-4 py-1.5 rounded font-medium bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white cursor-pointer transition-all flex items-center gap-1 border-none"
-                    >
-                      <mat-icon class="text-xs w-4 h-4">save</mat-icon>
-                      Auswahl aktualisieren
-                    </button>
-                  </div>
-                </div>
-              }
-
               <!-- Inventory Table container -->
               <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs text-zinc-300 border border-zinc-850 rounded-lg overflow-hidden">
                   <thead>
                      <tr class="bg-zinc-950/80 text-zinc-400 font-mono tracking-wider border-b border-zinc-800">
-                      <th class="px-2 sm:px-4 py-3 text-center w-10">
-                        <label class="inline-flex items-center justify-center cursor-pointer p-1 rounded hover:bg-zinc-800 transition-colors">
-                          <input type="checkbox" [checked]="isAllItemsSelected()" (change)="toggleSelectAllItems()" class="w-4 h-4 rounded bg-zinc-950 border-zinc-800 text-indigo-500 focus:ring-indigo-500 accent-indigo-500">
-                        </label>
-                      </th>
                       <th class="px-2 sm:px-4 py-3">ID</th>
                       <th class="px-2 sm:px-4 py-3">Artikel</th>
                       <th class="px-2 sm:px-4 py-3 hidden sm:table-cell">Kategorie</th>
@@ -1849,12 +1792,7 @@
                   </thead>
                   <tbody>
                      @for (item of inventory; track item.id) {
-                      <tr class="border-b border-zinc-850 hover:bg-zinc-800/20 transition-colors" [class.bg-indigo-500/5]="isItemSelected(item.id)">
-                        <td class="px-2 sm:px-4 py-3.5 text-center w-10">
-                          <label class="inline-flex items-center justify-center cursor-pointer p-1 rounded hover:bg-zinc-800/50 transition-colors">
-                            <input type="checkbox" [checked]="isItemSelected(item.id)" (change)="toggleSelectItem(item.id)" class="w-4 h-4 rounded bg-zinc-950 border-zinc-800 text-indigo-500 focus:ring-indigo-500 accent-indigo-500">
-                          </label>
-                        </td>
+                      <tr class="border-b border-zinc-850 hover:bg-zinc-800/20 transition-colors">
                         <td class="px-2 sm:px-4 py-3.5 font-mono text-[11px] text-zinc-500">#00{{ item.id }}</td>
                         <td class="px-2 sm:px-4 py-3.5">
                           <strong class="text-zinc-200 block font-medium">{{ item.name }}</strong>
