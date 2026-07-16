@@ -210,7 +210,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       let ReactDOMClient: { createRoot: (container: HTMLElement) => ReactRoot };
       let Recharts: {
         ResponsiveContainer: unknown;
-        LineChart: unknown;
+        ComposedChart: unknown;
         CartesianGrid: unknown;
         XAxis: unknown;
         YAxis: unknown;
@@ -221,22 +221,32 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       };
       
       try {
-        const reactMod = await import('react');
-        React = reactMod.default as unknown as { createElement: (type: unknown, props?: unknown, ...children: unknown[]) => unknown };
-        ReactDOMClient = await import('react-dom/client') as unknown as { createRoot: (container: HTMLElement) => ReactRoot };
-        Recharts = await import('recharts') as unknown as {
-          ResponsiveContainer: unknown;
-          LineChart: unknown;
-          CartesianGrid: unknown;
-          XAxis: unknown;
-          YAxis: unknown;
-          Tooltip: unknown;
-          Legend: unknown;
-          Line: unknown;
-          Area: unknown;
+        const reactMod = await import('react') as any;
+        React = reactMod.createElement ? reactMod : (reactMod.default?.createElement ? reactMod.default : reactMod);
+        
+        const reactDomMod = await import('react-dom/client') as any;
+        ReactDOMClient = reactDomMod.createRoot ? reactDomMod : (reactDomMod.default?.createRoot ? reactDomMod.default : reactDomMod);
+        
+        const rechartsMod = await import('recharts') as any;
+        const getComp = (name: string) => {
+          if (rechartsMod && rechartsMod[name] !== undefined) return rechartsMod[name];
+          if (rechartsMod && rechartsMod.default && rechartsMod.default[name] !== undefined) return rechartsMod.default[name];
+          return undefined;
         };
-      } catch {
-        console.error('Error importing react/recharts');
+
+        Recharts = {
+          ResponsiveContainer: getComp('ResponsiveContainer'),
+          ComposedChart: getComp('ComposedChart'),
+          CartesianGrid: getComp('CartesianGrid'),
+          XAxis: getComp('XAxis'),
+          YAxis: getComp('YAxis'),
+          Tooltip: getComp('Tooltip'),
+          Legend: getComp('Legend'),
+          Line: getComp('Line'),
+          Area: getComp('Area'),
+        };
+      } catch (err) {
+        console.error('Error importing react/recharts:', err);
         return;
       }
 
@@ -260,7 +270,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
           Recharts.ResponsiveContainer,
           { width: '100%', height: '100%' },
           React.createElement(
-            Recharts.LineChart,
+            Recharts.ComposedChart,
             { 
               data: this.filteredMonthlyMovements, 
               margin: { top: 20, right: 30, left: 10, bottom: 10 } 
