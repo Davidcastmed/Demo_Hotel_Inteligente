@@ -712,6 +712,16 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   cameraViewMode: 'single' | 'grid' = 'single';
   cameraStatus: 'ONLINE' | 'RECORDING' | 'OFFLINE' = 'ONLINE';
   isSimulating = false;
+
+  // Digital Zoom state properties
+  zoomScale = 1;
+  zoomTranslateX = 0;
+  zoomTranslateY = 0;
+  isDragging = false;
+  dragStartPercentX = 0;
+  dragStartPercentY = 0;
+  dragCurrentPercentX = 0;
+  dragCurrentPercentY = 0;
   activeSimulationType: string | null = null;
   simulationProgress = 0;
   simulationLogs: string[] = [];
@@ -1058,9 +1068,132 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
   // Switch camera feed and update corresponding YOLO bounding boxes
   switchCamera(cam: string) {
+    this.resetZoom();
     this.activeCamera = cam as 'entrada' | 'cocina' | 'lavanderia' | 'bodega' | 'muelle';
     this.updateCameraDetections();
     this.cdr.markForCheck();
+  }
+
+  // Interactive digital zoom handlers
+  onZoomMouseDown(event: MouseEvent) {
+    // Only handle primary (left) mouse button
+    if (event.button !== 0) return;
+    
+    // Don't trigger zoom drag if we clicked on an interactive element (buttons, icons, etc)
+    const target = event.target as HTMLElement;
+    if (target.closest('button') || target.closest('a') || target.closest('.cursor-pointer')) {
+      return;
+    }
+
+    const coords = this.getPercentCoords(event);
+    this.isDragging = true;
+    this.dragStartPercentX = coords.x;
+    this.dragStartPercentY = coords.y;
+    this.dragCurrentPercentX = coords.x;
+    this.dragCurrentPercentY = coords.y;
+    
+    event.preventDefault();
+  }
+
+  onZoomMouseMove(event: MouseEvent) {
+    if (!this.isDragging) return;
+    const coords = this.getPercentCoords(event);
+    this.dragCurrentPercentX = coords.x;
+    this.dragCurrentPercentY = coords.y;
+    this.cdr.markForCheck();
+  }
+
+  onZoomMouseUp(event: MouseEvent) {
+    if (!this.isDragging) return;
+    this.isDragging = false;
+    
+    const coords = this.getPercentCoords(event);
+    this.dragCurrentPercentX = coords.x;
+    this.dragCurrentPercentY = coords.y;
+
+    const dx = Math.abs(this.dragCurrentPercentX - this.dragStartPercentX);
+    const dy = Math.abs(this.dragCurrentPercentY - this.dragStartPercentY);
+
+    if (dx < 1.5 && dy < 1.5) {
+      // Small movement is treated as a click: toggle zoom at clicked point
+      if (this.zoomScale > 1) {
+        this.resetZoom();
+      } else {
+        // Zoom in to 2.5x centered on click point
+        const cx = coords.x;
+        const cy = coords.y;
+        this.zoomScale = 2.5;
+        this.zoomTranslateX = -Math.max(0, Math.min(100 - 100/this.zoomScale, cx - 50/this.zoomScale));
+        this.zoomTranslateY = -Math.max(0, Math.min(100 - 100/this.zoomScale, cy - 50/this.zoomScale));
+      }
+    } else {
+      // Large movement is treated as a rectangular select box drag
+      const x1 = Math.min(this.dragStartPercentX, this.dragCurrentPercentX);
+      const y1 = Math.min(this.dragStartPercentY, this.dragCurrentPercentY);
+      const w = Math.max(3, dx);
+      const h = Math.max(3, dy);
+
+      // Scale to fit the viewport dimensions
+      const scaleX = 100 / w;
+      const scaleY = 100 / h;
+      this.zoomScale = Math.max(1.2, Math.min(8, Math.min(scaleX, scaleY)));
+
+      // Center the zoomed selection box
+      const cx = x1 + w / 2;
+      const cy = y1 + h / 2;
+      this.zoomTranslateX = -Math.max(0, Math.min(100 - 100/this.zoomScale, cx - 50/this.zoomScale));
+      this.zoomTranslateY = -Math.max(0, Math.min(100 - 100/this.zoomScale, cy - 50/this.zoomScale));
+    }
+    
+    this.cdr.markForCheck();
+  }
+
+  resetZoom(event?: MouseEvent) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    this.zoomScale = 1;
+    this.zoomTranslateX = 0;
+    this.zoomTranslateY = 0;
+    this.cdr.markForCheck();
+  }
+
+  getZoomTransformStyle(): string {
+    if (this.zoomScale <= 1) {
+      return 'none';
+    }
+    return `scale(${this.zoomScale}) translate(${this.zoomTranslateX}%, ${this.zoomTranslateY}%)`;
+  }
+
+  getPercentCoords(event: MouseEvent): { x: number, y: number } {
+    const container = document.querySelector('.camera-zoom-container');
+    if (!container) {
+      return { x: 0, y: 0 };
+    }
+    const rect = container.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    return {
+      x: Math.max(0, Math.min(100, x)),
+      y: Math.max(0, Math.min(100, y))
+    };
+  }
+
+  getDragBoxLeft(): number {
+    return Math.min(this.dragStartPercentX, this.dragCurrentPercentX);
+  }
+
+  getDragBoxTop(): number {
+    return Math.min(this.dragStartPercentY, this.dragCurrentPercentY);
+  }
+
+  getDragBoxWidth(): number {
+    return Math.abs(this.dragCurrentPercentX - this.dragStartPercentX);
+  }
+
+  getDragBoxHeight(): number {
+    return Math.abs(this.dragCurrentPercentY - this.dragStartPercentY);
   }
 
   getCameraDetections(cam: string): DetectionBox[] {
