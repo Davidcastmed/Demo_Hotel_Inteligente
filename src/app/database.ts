@@ -37,6 +37,7 @@ export interface MonthlyMovement {
   entnahmen: number;
   differenz: number;
   activeStock: number;
+  reubicaciones?: number;
   activeStockRange?: [number, number];
 }
 
@@ -90,13 +91,13 @@ const initialPeople: Person[] = [
 ];
 
 const initialMonthlyMovements: MonthlyMovement[] = [
-  { month: 'Jan', eingaenge: 120, entnahmen: 105, differenz: 15, activeStock: 45 },
-  { month: 'Feb', eingaenge: 140, entnahmen: 115, differenz: 25, activeStock: 50 },
-  { month: 'Mär', eingaenge: 160, entnahmen: 150, differenz: 10, activeStock: 55 },
-  { month: 'Apr', eingaenge: 110, entnahmen: 125, differenz: -15, activeStock: 48 },
-  { month: 'Mai', eingaenge: 180, entnahmen: 140, differenz: 40, activeStock: 60 },
-  { month: 'Jun', eingaenge: 195, entnahmen: 170, differenz: 25, activeStock: 68 },
-  { month: 'Jul', eingaenge: 43, entnahmen: 8, differenz: 35, activeStock: 72 }
+  { month: 'Jan', eingaenge: 120, entnahmen: 105, differenz: 15, activeStock: 45, reubicaciones: 12 },
+  { month: 'Feb', eingaenge: 140, entnahmen: 115, differenz: 25, activeStock: 50, reubicaciones: 8 },
+  { month: 'Mär', eingaenge: 160, entnahmen: 150, differenz: 10, activeStock: 55, reubicaciones: 15 },
+  { month: 'Apr', eingaenge: 110, entnahmen: 125, differenz: -15, activeStock: 48, reubicaciones: 14 },
+  { month: 'Mai', eingaenge: 180, entnahmen: 140, differenz: 40, activeStock: 60, reubicaciones: 19 },
+  { month: 'Jun', eingaenge: 195, entnahmen: 170, differenz: 25, activeStock: 68, reubicaciones: 22 },
+  { month: 'Jul', eingaenge: 43, entnahmen: 8, differenz: 35, activeStock: 72, reubicaciones: 5 }
 ];
 
 const initialAlertPreferences: AlertPreference = {
@@ -635,6 +636,16 @@ export class Database {
       this.people = this.people.map((p: Person) => {
         if (p.id === 'p-2') return { ...p, location: 'Gang D (Umlagernd)', detectedAt: timestamp };
         return p;
+      });
+
+      this.monthlyMovements = this.monthlyMovements.map((m: MonthlyMovement) => {
+        if (m.month === 'Jul') {
+          return {
+            ...m,
+            reubicaciones: (m.reubicaciones || 0) + 1
+          };
+        }
+        return m;
       });
 
     } else if (action === 'reset') {

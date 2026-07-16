@@ -60,6 +60,7 @@ interface MonthlyMovement {
   entnahmen: number;
   differenz: number;
   activeStock: number;
+  reubicaciones?: number;
   activeStockRange?: [number, number];
 }
 
@@ -221,16 +222,17 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       };
       
       try {
-        const reactMod = await import('react') as any;
-        React = reactMod.createElement ? reactMod : (reactMod.default?.createElement ? reactMod.default : reactMod);
+        const reactMod = await import('react') as unknown as Record<string, unknown>;
+        React = (reactMod['createElement'] ? reactMod : ((reactMod['default'] as Record<string, unknown>)?.['createElement'] ? reactMod['default'] : reactMod)) as unknown as { createElement: (type: unknown, props?: unknown, ...children: unknown[]) => unknown };
         
-        const reactDomMod = await import('react-dom/client') as any;
-        ReactDOMClient = reactDomMod.createRoot ? reactDomMod : (reactDomMod.default?.createRoot ? reactDomMod.default : reactDomMod);
+        const reactDomMod = await import('react-dom/client') as unknown as Record<string, unknown>;
+        ReactDOMClient = (reactDomMod['createRoot'] ? reactDomMod : ((reactDomMod['default'] as Record<string, unknown>)?.['createRoot'] ? reactDomMod['default'] : reactDomMod)) as unknown as { createRoot: (container: HTMLElement) => ReactRoot };
         
-        const rechartsMod = await import('recharts') as any;
+        const rechartsMod = await import('recharts') as unknown as Record<string, unknown>;
         const getComp = (name: string) => {
           if (rechartsMod && rechartsMod[name] !== undefined) return rechartsMod[name];
-          if (rechartsMod && rechartsMod.default && rechartsMod.default[name] !== undefined) return rechartsMod.default[name];
+          const def = rechartsMod['default'] as Record<string, unknown>;
+          if (rechartsMod && def && def[name] !== undefined) return def[name];
           return undefined;
         };
 
@@ -306,6 +308,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
               formatter: (value: string) => {
                 if (value === 'eingaenge') return 'Waren-Eingänge';
                 if (value === 'entnahmen') return 'Waren-Entnahmen';
+                if (value === 'reubicaciones') return 'Umlagerungen';
                 if (value === 'activeStock') return 'Lagerindex';
                 if (value === 'activeStockRange') return '95% Konfidenzbereich';
                 return value;
@@ -336,6 +339,15 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
               strokeWidth: 2.5,
               dot: { r: 3, fill: '#F43F5E', strokeWidth: 0 },
               activeDot: { r: 6, strokeWidth: 1 }
+            }),
+            React.createElement(Recharts.Line, { 
+              type: 'monotone', 
+              dataKey: 'reubicaciones', 
+              name: 'reubicaciones', 
+              stroke: '#F59E0B', 
+              strokeWidth: 2,
+              dot: { r: 3, fill: '#F59E0B', strokeWidth: 0 },
+              activeDot: { r: 5, strokeWidth: 1 }
             }),
             React.createElement(Recharts.Line, { 
               type: 'monotone', 
@@ -408,28 +420,30 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     let data = this.monthlyMovements;
     
     if (this.selectedCategory !== 'Alle') {
-      const ratios: Record<string, { eingaenge: number, entnahmen: number, activeStock: number }> = {
-        'Getränke': { eingaenge: 0.35, entnahmen: 0.32, activeStock: 0.40 },
-        'Grundnahrungsmittel': { eingaenge: 0.25, entnahmen: 0.22, activeStock: 0.25 },
-        'Milchprodukte': { eingaenge: 0.15, entnahmen: 0.18, activeStock: 0.12 },
-        'Verderbliche Waren': { eingaenge: 0.12, entnahmen: 0.15, activeStock: 0.08 },
-        'Reinigungsmittel': { eingaenge: 0.08, entnahmen: 0.07, activeStock: 0.08 },
-        'Wäschebestand': { eingaenge: 0.10, entnahmen: 0.09, activeStock: 0.15 },
-        'Zutritt & Sicherheit': { eingaenge: 0.05, entnahmen: 0.04, activeStock: 0.05 },
+      const ratios: Record<string, { eingaenge: number, entnahmen: number, activeStock: number, reubicaciones: number }> = {
+        'Getränke': { eingaenge: 0.35, entnahmen: 0.32, activeStock: 0.40, reubicaciones: 0.30 },
+        'Grundnahrungsmittel': { eingaenge: 0.25, entnahmen: 0.22, activeStock: 0.25, reubicaciones: 0.20 },
+        'Milchprodukte': { eingaenge: 0.15, entnahmen: 0.18, activeStock: 0.12, reubicaciones: 0.15 },
+        'Verderbliche Waren': { eingaenge: 0.12, entnahmen: 0.15, activeStock: 0.08, reubicaciones: 0.10 },
+        'Reinigungsmittel': { eingaenge: 0.08, entnahmen: 0.07, activeStock: 0.08, reubicaciones: 0.10 },
+        'Wäschebestand': { eingaenge: 0.10, entnahmen: 0.09, activeStock: 0.15, reubicaciones: 0.10 },
+        'Zutritt & Sicherheit': { eingaenge: 0.05, entnahmen: 0.04, activeStock: 0.05, reubicaciones: 0.05 },
       };
       
-      const ratio = ratios[this.selectedCategory] || { eingaenge: 1, entnahmen: 1, activeStock: 1 };
+      const ratio = ratios[this.selectedCategory] || { eingaenge: 1, entnahmen: 1, activeStock: 1, reubicaciones: 1 };
       
       data = this.monthlyMovements.map(m => {
         const e = Math.round(m.eingaenge * ratio.eingaenge);
         const en = Math.round(m.entnahmen * ratio.entnahmen);
         const s = Math.round(m.activeStock * ratio.activeStock);
+        const re = Math.round((m.reubicaciones || 0) * ratio.reubicaciones);
         return {
           month: m.month,
           eingaenge: e,
           entnahmen: en,
           differenz: e - en,
-          activeStock: s
+          activeStock: s,
+          reubicaciones: re
         };
       });
     }
